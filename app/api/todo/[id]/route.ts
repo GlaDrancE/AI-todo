@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 // PATCH - Update a todo (toggle completed)
 export async function PATCH(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { userId } = await auth()
@@ -15,10 +15,11 @@ export async function PATCH(
         }
 
         const { completed } = await req.json()
+        const { id } = await params  // Await params here
 
         // Verify the todo belongs to the user
         const existingTodo = await prisma.todo.findFirst({
-            where: { id: params.id, userId },
+            where: { id, userId },
         })
 
         if (!existingTodo) {
@@ -26,7 +27,7 @@ export async function PATCH(
         }
 
         const todo = await prisma.todo.update({
-            where: { id: params.id },
+            where: { id },
             data: { completed },
             include: { files: true },
         })
@@ -41,7 +42,7 @@ export async function PATCH(
 // DELETE - Delete a todo
 export async function DELETE(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { userId } = await auth()
@@ -50,9 +51,11 @@ export async function DELETE(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        const { id } = await params  // Await params here
+
         // Verify the todo belongs to the user
         const existingTodo = await prisma.todo.findFirst({
-            where: { id: params.id, userId },
+            where: { id, userId },
         })
 
         if (!existingTodo) {
@@ -60,7 +63,7 @@ export async function DELETE(
         }
 
         await prisma.todo.delete({
-            where: { id: params.id },
+            where: { id },
         })
 
         return NextResponse.json({ success: true })
