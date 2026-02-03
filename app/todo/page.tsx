@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Trash2, Upload, FileText, Image, FileSpreadsheet, File, X, Check } from "lucide-react";
 import Dashboard from "./layout";
 import { useUser } from "@clerk/nextjs"
+import AIContextService from "@/services/AIContextService";
+import { currentUser } from "@clerk/nextjs/server";
 
 interface TodoFile {
   id: string;
@@ -135,6 +137,36 @@ function TodoComponent() {
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
+  const handleGenerateTodo = async () => {
+    const response = await fetch("/api/ai/generate-todo")
+    const data = await response.json();
+    const todos = data.todos.map((todo: string) => ({
+      id: crypto.randomUUID(),
+      text: todo,
+      completed: false,
+      files: [],
+      createdAt: new Date(),
+    }));
+    const todoResponse = await fetch("/api/todo/ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ todos: data.todos }),
+    });
+    const todoData = await todoResponse.json();
+    console.log(todoData)
+  }
+
+  const handleAnalyzeTodo = async () => {
+    const todoText = todos.map((todo) => todo.text).join("\n");
+    const response = await fetch("/api/ai/analyze-todo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ todoText: todoText }),
+    });
+    const data = await response.json();
+    console.log(data)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-900 relative overflow-hidden">
 
@@ -163,7 +195,7 @@ function TodoComponent() {
 
             {/* File Upload */}
             <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 
+              {/* <label className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 
                                border border-purple-500/30 rounded-lg cursor-pointer transition-all">
                 <Upload className="w-4 h-4 text-purple-300" />
                 <span className="text-sm text-purple-200">Attach Files</span>
@@ -174,7 +206,7 @@ function TodoComponent() {
                   onChange={handleFileChange}
                   className="hidden"
                 />
-              </label>
+              </label> */}
 
               <button
                 onClick={handleAddTodo}
@@ -287,6 +319,31 @@ function TodoComponent() {
           )}
         </div>
 
+        {/* AI Action Buttons */}
+        <div className="flex justify-center gap-4 mt-8 mb-6">
+          <button
+            onClick={handleGenerateTodo}
+            className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 
+                     hover:to-blue-700 text-white rounded-lg font-medium transition-all transform 
+                     hover:scale-105 active:scale-95 shadow-lg hover:shadow-cyan-500/25 
+                     border border-cyan-500/30 backdrop-blur-sm"
+          >
+            <span className="flex items-center gap-2">
+              ✨ Generate Todo
+            </span>
+          </button>
+          <button
+            onClick={handleAnalyzeTodo}
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 
+                     hover:to-pink-700 text-white rounded-lg font-medium transition-all transform 
+                     hover:scale-105 active:scale-95 shadow-lg hover:shadow-purple-500/25 
+                     border border-purple-500/30 backdrop-blur-sm"
+          >
+            <span className="flex items-center gap-2">
+              🔍 Analyze Todo
+            </span>
+          </button>
+        </div>
         {/* Stats */}
         {todos.length > 0 && (
           <div className="mt-8 text-center">

@@ -25,9 +25,19 @@ export default function SettingsPage() {
     useEffect(() => {
         if (isLoaded && user) {
             fetchProfile();
+            fetchContextFiles();
+
         }
     }, [isLoaded, user]);
 
+    const fetchContextFiles = async () => {
+        try {
+            const response = await fetch("/api/context-files");
+            console.log(response.json())
+        } catch (error) {
+            console.log(error)
+        }
+    }
     const fetchProfile = async () => {
         try {
             const response = await fetch("/api/profile");

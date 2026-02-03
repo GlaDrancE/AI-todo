@@ -1,9 +1,11 @@
-import { PDFParse } from "pdf-parse"
+import PDFParser from "pdf2json"
 import mammoth from "mammoth";
 import { read, utils } from "xlsx"
 import Tesseract from "tesseract.js";
+import { rejects } from "assert";
 class FileParseService {
     async parseFile(buffer: Buffer, fileType: string): Promise<string> {
+        console.log(fileType)
         try {
             if (fileType.includes('pdf')) {
                 return await this.parsePdf(buffer);
@@ -20,10 +22,28 @@ class FileParseService {
             return '';
         }
     }
-
     private async parsePdf(buffer: Buffer): Promise<string> {
-        const data = new PDFParse({ data: buffer })
-        return (await data.getText()).text;
+        return new Promise((resolve, reject) => {
+            const pdfParser = new PDFParser(null, true); // Add raw text mode
+
+            pdfParser.on("pdfParser_dataError", (errData: any) => {
+                console.error('❌ PDF Parser Error:', errData);
+                reject(errData.parserError);
+            });
+
+            pdfParser.on("pdfParser_dataReady", (pdfData: any) => {
+                try {
+                    const text = pdfParser.getRawTextContent();
+                    console.log('🔍 PDF text extracted, length:', text?.length || 0);
+                    resolve(text || '');
+                } catch (err) {
+                    console.error('❌ Error getting text content:', err);
+                    resolve(''); // Resolve with empty string instead of rejecting
+                }
+            });
+
+            pdfParser.parseBuffer(buffer);
+        });
     }
     private async parseDoc(buffer: Buffer): Promise<string> {
         const doc = await mammoth.extractRawText({ buffer })
