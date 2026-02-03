@@ -27,3 +27,18 @@ export type Todo = Prisma.TodoModel
  * 
  */
 export type TodoFile = Prisma.TodoFileModel
+/**
+ * Model UserProfile
+ * 
+ */
+export type UserProfile = Prisma.UserProfileModel
+/**
+ * Model ContextFile
+ * 
+ */
+export type ContextFile = Prisma.ContextFileModel
+/**
+ * Model AIContext
+ * 
+ */
+export type AIContext = Prisma.AIContextModel

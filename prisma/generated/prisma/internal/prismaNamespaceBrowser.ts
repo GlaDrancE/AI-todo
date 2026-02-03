@@ -52,7 +52,10 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Todo: 'Todo',
-  TodoFile: 'TodoFile'
+  TodoFile: 'TodoFile',
+  UserProfile: 'UserProfile',
+  ContextFile: 'ContextFile',
+  AIContext: 'AIContext'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -96,6 +99,46 @@ export const TodoFileScalarFieldEnum = {
 export type TodoFileScalarFieldEnum = (typeof TodoFileScalarFieldEnum)[keyof typeof TodoFileScalarFieldEnum]
 
 
+export const UserProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  whoIAm: 'whoIAm',
+  whatIWantToAchieve: 'whatIWantToAchieve',
+  whatIWantInLife: 'whatIWantInLife',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserProfileScalarFieldEnum = (typeof UserProfileScalarFieldEnum)[keyof typeof UserProfileScalarFieldEnum]
+
+
+export const ContextFileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  type: 'type',
+  size: 'size',
+  storageUrl: 'storageUrl',
+  extractedText: 'extractedText',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContextFileScalarFieldEnum = (typeof ContextFileScalarFieldEnum)[keyof typeof ContextFileScalarFieldEnum]
+
+
+export const AIContextScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  lastProcessedAt: 'lastProcessedAt',
+  embeddingVersion: 'embeddingVersion',
+  contextSummary: 'contextSummary'
+} as const
+
+export type AIContextScalarFieldEnum = (typeof AIContextScalarFieldEnum)[keyof typeof AIContextScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -104,10 +147,35 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

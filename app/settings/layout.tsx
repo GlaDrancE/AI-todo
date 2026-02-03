@@ -3,7 +3,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 
-const Dashboard = async ({ children }: { children: React.ReactNode }) => {
+const SettingsLayout = async ({ children }: { children: React.ReactNode }) => {
     const user = await currentUser();
     return (
         <>
@@ -27,4 +27,5 @@ const Dashboard = async ({ children }: { children: React.ReactNode }) => {
         </>
     )
 }
-export default Dashboard;
+export default SettingsLayout;
+

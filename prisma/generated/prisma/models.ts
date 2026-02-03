@@ -10,4 +10,7 @@
  */
 export type * from './models/Todo'
 export type * from './models/TodoFile'
+export type * from './models/UserProfile'
+export type * from './models/ContextFile'
+export type * from './models/AIContext'
 export type * from './commonInputTypes'

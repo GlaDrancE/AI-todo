@@ -40,3 +40,41 @@ model TodoFile {
   @@index([todoId])
   @@map("todo_files")
 }
+
+model UserProfile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique // Clerk user ID
+  whoIAm             String?  @db.Text
+  whatIWantToAchieve String?  @db.Text
+  whatIWantInLife    String?  @db.Text
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("user_profiles")
+}
+
+model ContextFile {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String
+  type          String // pdf, docx, xlsx, image
+  size          Int
+  storageUrl    String // S3/Cloudflare R2 URL
+  extractedText String?  @db.Text // Parsed content
+  metadata      Json? // Additional metadata (page count, sheets, etc)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@map("context_files")
+}
+
+model AIContext {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  lastProcessedAt  DateTime?
+  embeddingVersion String? // Track embedding model version
+  contextSummary   String?   @db.Text // AI-generated summary of all context
+
+  @@map("ai_contexts")
+}

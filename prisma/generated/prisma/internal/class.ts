@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.3.0",
   "engineVersion": "9d6ad21cbbceab97458517b147a6a09ff43aa735",
   "activeProvider": "postgresql",
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../app/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Todo {\n  id        String     @id @default(cuid())\n  userId    String // Clerk user ID\n  text      String\n  completed Boolean    @default(false)\n  createdAt DateTime   @default(now())\n  updatedAt DateTime   @updatedAt\n  files     TodoFile[]\n\n  @@index([userId])\n  @@map(\"todos\")\n}\n\nmodel TodoFile {\n  id        String   @id @default(cuid())\n  todoId    String\n  name      String\n  type      String\n  size      Int\n  url       String\n  createdAt DateTime @default(now())\n\n  todo Todo @relation(fields: [todoId], references: [id], onDelete: Cascade)\n\n  @@index([todoId])\n  @@map(\"todo_files\")\n}\n",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Todo {\n  id        String     @id @default(cuid())\n  userId    String // Clerk user ID\n  text      String\n  completed Boolean    @default(false)\n  createdAt DateTime   @default(now())\n  updatedAt DateTime   @updatedAt\n  files     TodoFile[]\n\n  @@index([userId])\n  @@map(\"todos\")\n}\n\nmodel TodoFile {\n  id        String   @id @default(cuid())\n  todoId    String\n  name      String\n  type      String\n  size      Int\n  url       String\n  createdAt DateTime @default(now())\n\n  todo Todo @relation(fields: [todoId], references: [id], onDelete: Cascade)\n\n  @@index([todoId])\n  @@map(\"todo_files\")\n}\n\nmodel UserProfile {\n  id                 String   @id @default(cuid())\n  userId             String   @unique // Clerk user ID\n  whoIAm             String?  @db.Text\n  whatIWantToAchieve String?  @db.Text\n  whatIWantInLife    String?  @db.Text\n  createdAt          DateTime @default(now())\n  updatedAt          DateTime @updatedAt\n\n  @@map(\"user_profiles\")\n}\n\nmodel ContextFile {\n  id            String   @id @default(cuid())\n  userId        String\n  name          String\n  type          String // pdf, docx, xlsx, image\n  size          Int\n  storageUrl    String // S3/Cloudflare R2 URL\n  extractedText String?  @db.Text // Parsed content\n  metadata      Json? // Additional metadata (page count, sheets, etc)\n  createdAt     DateTime @default(now())\n  updatedAt     DateTime @updatedAt\n\n  @@index([userId])\n  @@map(\"context_files\")\n}\n\nmodel AIContext {\n  id               String    @id @default(cuid())\n  userId           String    @unique\n  lastProcessedAt  DateTime?\n  embeddingVersion String? // Track embedding model version\n  contextSummary   String?   @db.Text // AI-generated summary of all context\n\n  @@map(\"ai_contexts\")\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -28,7 +28,7 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Todo\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"text\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"completed\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"files\",\"kind\":\"object\",\"type\":\"TodoFile\",\"relationName\":\"TodoToTodoFile\"}],\"dbName\":\"todos\"},\"TodoFile\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"todoId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"size\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"todo\",\"kind\":\"object\",\"type\":\"Todo\",\"relationName\":\"TodoToTodoFile\"}],\"dbName\":\"todo_files\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Todo\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"text\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"completed\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"files\",\"kind\":\"object\",\"type\":\"TodoFile\",\"relationName\":\"TodoToTodoFile\"}],\"dbName\":\"todos\"},\"TodoFile\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"todoId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"size\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"todo\",\"kind\":\"object\",\"type\":\"Todo\",\"relationName\":\"TodoToTodoFile\"}],\"dbName\":\"todo_files\"},\"UserProfile\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"whoIAm\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"whatIWantToAchieve\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"whatIWantInLife\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"user_profiles\"},\"ContextFile\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"size\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"storageUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"extractedText\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"metadata\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"context_files\"},\"AIContext\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"lastProcessedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"embeddingVersion\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"contextSummary\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":\"ai_contexts\"}},\"enums\":{},\"types\":{}}")
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
   const { Buffer } = await import('node:buffer')
@@ -195,6 +195,36 @@ export interface PrismaClient<
     * ```
     */
   get todoFile(): Prisma.TodoFileDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.userProfile`: Exposes CRUD operations for the **UserProfile** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more UserProfiles
+    * const userProfiles = await prisma.userProfile.findMany()
+    * ```
+    */
+  get userProfile(): Prisma.UserProfileDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.contextFile`: Exposes CRUD operations for the **ContextFile** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ContextFiles
+    * const contextFiles = await prisma.contextFile.findMany()
+    * ```
+    */
+  get contextFile(): Prisma.ContextFileDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.aIContext`: Exposes CRUD operations for the **AIContext** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AIContexts
+    * const aIContexts = await prisma.aIContext.findMany()
+    * ```
+    */
+  get aIContext(): Prisma.AIContextDelegate<ExtArgs, { omit: OmitOpts }>;
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {
