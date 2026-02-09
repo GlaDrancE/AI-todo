@@ -29,6 +29,10 @@ function TodoComponent() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const { user, isLoaded } = useUser()
   const [isLoading, setIsLoading] = useState(false);
+  const [showApprovalDialog, setShowApprovalDialog] = useState(false);
+  const [improvedTodos, setImprovedTodos] = useState<Todo[]>([]);
+  const [isGeneratingTodo, setIsGeneratingTodo] = useState(false);
+  const [isAnalyzingTodo, setIsAnalyzingTodo] = useState(false);
   useEffect(() => {
     if (isLoaded && user) {
       fetchTodos()
@@ -47,7 +51,8 @@ function TodoComponent() {
   };
 
 
-  const handleAddTodo = async () => {
+  const handleAddTodo = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (inputValue.trim() === "" || isLoading) return;
 
     setIsLoading(true);
@@ -80,6 +85,21 @@ function TodoComponent() {
     }
   };
 
+  const handleUpdateTodoStatus = async (id: string, status: string) => {
+    try {
+      const response = await fetch(`/api/todo/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: status, text: todos.find((todo) => todo.id === id)?.text }),
+      });
+      if (response.ok) {
+        await fetchTodos();
+      }
+    } catch (error) {
+      console.error('Error updating todo status:', error);
+    }
+  }
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -97,7 +117,7 @@ function TodoComponent() {
       const response = await fetch(`/api/todo/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ completed: !currentCompleted }),
+        body: JSON.stringify({ completed: !currentCompleted, text: todos.find(todo => todo.id === id)?.text }),
       });
 
       if (response.ok) {
@@ -138,33 +158,90 @@ function TodoComponent() {
   };
 
   const handleGenerateTodo = async () => {
-    const response = await fetch("/api/ai/generate-todo")
-    const data = await response.json();
-    const todos = data.todos.map((todo: string) => ({
-      id: crypto.randomUUID(),
-      text: todo,
-      completed: false,
-      files: [],
-      createdAt: new Date(),
-    }));
-    const todoResponse = await fetch("/api/todo/ai", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ todos: data.todos }),
-    });
-    const todoData = await todoResponse.json();
-    console.log(todoData)
+    setIsGeneratingTodo(true);
+    try {
+      const response = await fetch("/api/ai/generate-todo")
+      const data = await response.json();
+      const todos = data.todos.map((todo: string) => ({
+        id: crypto.randomUUID(),
+        text: todo,
+        completed: false,
+        files: [],
+        createdAt: new Date(),
+      }));
+      const todoResponse = await fetch("/api/todo/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ todos: data.todos }),
+      });
+      const todoData = await todoResponse.json();
+      console.log(todoData)
+      await fetchTodos(); // Refresh the todo list
+    } catch (error) {
+      console.error('Error generating todos:', error);
+    } finally {
+      setIsGeneratingTodo(false);
+    }
   }
 
   const handleAnalyzeTodo = async () => {
-    const todoText = todos.map((todo) => todo.text).join("\n");
-    const response = await fetch("/api/ai/analyze-todo", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ todoText: todoText }),
-    });
-    const data = await response.json();
-    console.log(data)
+    setIsAnalyzingTodo(true);
+    try {
+      const todoText = todos.map((todo) => todo.text).join("\n");
+      const response = await fetch("/api/ai/analyze-todo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ todoText: todoText }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.todos.improved_todo) {
+          setImprovedTodos(data.todos.improved_todo.map((todo: string) => {
+            return {
+              id: crypto.randomUUID(),
+              text: todo,
+              completed: false,
+              files: [],
+              createdAt: new Date(),
+            }
+          }));
+          setShowApprovalDialog(true);
+        }
+      }
+      else {
+        console.error('Error analyzing todo:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error analyzing todo:', error);
+    } finally {
+      setIsAnalyzingTodo(false);
+    }
+  }
+
+  const handleApproveImprovedTodos = async () => {
+    try {
+      const response = await fetch("/api/ai/analyze-todo", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentTodos: todos, newTodos: improvedTodos }),
+      });
+      if (response.ok) {
+        await fetchTodos();
+        setTodos(improvedTodos);
+        setShowApprovalDialog(false);
+        setImprovedTodos([]);
+      }
+      else {
+        console.error('Error approving improved todos:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error approving improved todos:', error);
+    }
+  }
+
+  const handleRejectImprovedTodos = () => {
+    setShowApprovalDialog(false);
+    setImprovedTodos([]);
   }
 
   return (
@@ -181,12 +258,11 @@ function TodoComponent() {
 
         {/* Input Section */}
         <div className="cosmic-card p-6 mb-8">
-          <div className="space-y-4">
+          <form onSubmit={handleAddTodo} className="space-y-4">
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleAddTodo()}
               placeholder="Add a new cosmic task..."
               className="w-full px-4 py-3 bg-white/5 border border-purple-500/30 rounded-lg 
                        text-white placeholder-purple-300/50 focus:outline-none focus:ring-2 
@@ -209,7 +285,6 @@ function TodoComponent() {
               </label> */}
 
               <button
-                onClick={handleAddTodo}
                 className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 
                          hover:to-pink-700 text-white rounded-lg font-medium transition-all transform 
                          hover:scale-105 active:scale-95"
@@ -241,7 +316,7 @@ function TodoComponent() {
                 ))}
               </div>
             )}
-          </div>
+          </form>
         </div>
 
         {/* Todo List */}
@@ -323,24 +398,52 @@ function TodoComponent() {
         <div className="flex justify-center gap-4 mt-8 mb-6">
           <button
             onClick={handleGenerateTodo}
-            className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 
+            disabled={isGeneratingTodo}
+            className={`px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 
                      hover:to-blue-700 text-white rounded-lg font-medium transition-all transform 
                      hover:scale-105 active:scale-95 shadow-lg hover:shadow-cyan-500/25 
-                     border border-cyan-500/30 backdrop-blur-sm"
+                     border border-cyan-500/30 backdrop-blur-sm
+                     ${isGeneratingTodo ? 'opacity-50 cursor-not-allowed scale-100 hover:scale-100' : ''}`}
           >
             <span className="flex items-center gap-2">
-              ✨ Generate Todo
+              {isGeneratingTodo ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Generating...
+                </>
+              ) : (
+                <>
+                  ✨ Generate Todo
+                </>
+              )}
             </span>
           </button>
           <button
             onClick={handleAnalyzeTodo}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 
+            disabled={isAnalyzingTodo || todos.length === 0}
+            className={`px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 
                      hover:to-pink-700 text-white rounded-lg font-medium transition-all transform 
                      hover:scale-105 active:scale-95 shadow-lg hover:shadow-purple-500/25 
-                     border border-purple-500/30 backdrop-blur-sm"
+                     border border-purple-500/30 backdrop-blur-sm
+                     ${isAnalyzingTodo || todos.length === 0 ? 'opacity-50 cursor-not-allowed scale-100 hover:scale-100' : ''}`}
           >
             <span className="flex items-center gap-2">
-              🔍 Analyze Todo
+              {isAnalyzingTodo ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  🔍 Analyze Todo
+                </>
+              )}
             </span>
           </button>
         </div>
@@ -353,6 +456,86 @@ function TodoComponent() {
           </div>
         )}
       </div>
+
+      {/* Approval Dialog */}
+      {showApprovalDialog && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 border border-purple-500/30 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+            {/* Dialog Header */}
+            <div className="p-6 border-b border-purple-500/30">
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400">
+                🤖 AI Improved Todo List
+              </h2>
+              <p className="text-purple-200/70 text-sm mt-1">
+                Review the AI-suggested improvements to your todo list
+              </p>
+            </div>
+
+            {/* Dialog Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Current Todos */}
+                <div>
+                  <h3 className="text-lg font-semibold text-purple-300 mb-4 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-red-400 rounded-full"></span>
+                    Current Todos ({todos.length})
+                  </h3>
+                  <div className="space-y-2">
+                    {todos.map((todo, index) => (
+                      <div
+                        key={todo.id}
+                        className="p-3 bg-white/5 border border-purple-500/20 rounded-lg"
+                      >
+                        <div className="flex items-start gap-2">
+                          <span className="text-purple-400 text-sm font-medium">{index + 1}.</span>
+                          <p className="text-white text-sm flex-1">{todo.text}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Improved Todos */}
+                <div>
+                  <h3 className="text-lg font-semibold text-green-300 mb-4 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                    Improved Todos ({improvedTodos.length})
+                  </h3>
+                  <div className="space-y-2">
+                    {improvedTodos.map((todo, index) => (
+                      <div
+                        key={todo.id}
+                        className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg"
+                      >
+                        <div className="flex items-start gap-2">
+                          <span className="text-green-400 text-sm font-medium">{index + 1}.</span>
+                          <p className="text-white text-sm flex-1">{todo.text}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Dialog Footer */}
+            <div className="p-6 border-t border-purple-500/30 flex justify-end gap-4">
+              <button
+                onClick={handleRejectImprovedTodos}
+                className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleApproveImprovedTodos}
+                className="px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg font-medium transition-all transform hover:scale-105 active:scale-95 shadow-lg"
+              >
+                ✓ Approve & Replace
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

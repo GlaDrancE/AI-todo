@@ -42,3 +42,8 @@ export type ContextFile = Prisma.ContextFileModel
  * 
  */
 export type AIContext = Prisma.AIContextModel
+/**
+ * Model ContextEmbedding
+ * 
+ */
+export type ContextEmbedding = Prisma.ContextEmbeddingModel

@@ -55,7 +55,8 @@ export const ModelName = {
   TodoFile: 'TodoFile',
   UserProfile: 'UserProfile',
   ContextFile: 'ContextFile',
-  AIContext: 'AIContext'
+  AIContext: 'AIContext',
+  ContextEmbedding: 'ContextEmbedding'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -137,6 +138,19 @@ export const AIContextScalarFieldEnum = {
 } as const
 
 export type AIContextScalarFieldEnum = (typeof AIContextScalarFieldEnum)[keyof typeof AIContextScalarFieldEnum]
+
+
+export const ContextEmbeddingScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  contentType: 'contentType',
+  contentId: 'contentId',
+  text: 'text',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type ContextEmbeddingScalarFieldEnum = (typeof ContextEmbeddingScalarFieldEnum)[keyof typeof ContextEmbeddingScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { User, Target, Heart, Save, Sparkles, Mail, Calendar, FileText } from "lucide-react";
+import { User, Target, Heart, Save, Sparkles, Mail, Calendar, FileText, Trash2 } from "lucide-react";
 import { ContextFile } from "@/prisma/generated/prisma/client";
 
 interface UserProfile {
@@ -33,7 +33,10 @@ export default function SettingsPage() {
     const fetchContextFiles = async () => {
         try {
             const response = await fetch("/api/context-files");
-            console.log(response.json())
+            if (response.ok) {
+                const data = await response.json();
+                setContextFiles(data);
+            }
         } catch (error) {
             console.log(error)
         }
@@ -55,7 +58,20 @@ export default function SettingsPage() {
             console.error("Error fetching profile:", error);
         }
     };
-
+    const deleteFile = async (id: string) => {
+        try {
+            const response = await fetch(`/api/context-files`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id }),
+            });
+            if (response.ok) {
+                setContextFiles((files) => files.filter(file => file.id != id))
+            }
+        } catch (error) {
+            console.error("Error deleting file:", error);
+        }
+    }
     const handleSave = async () => {
         if (isLoading) return;
 
@@ -302,14 +318,17 @@ export default function SettingsPage() {
                     {/* List existing context files */}
                     <div className="space-y-2">
                         {contextFiles.map(file => (
-                            <div key={file.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                                <div>
-                                    <p className="text-white">{file.name}</p>
-                                    <p className="text-xs text-purple-400/60">
-                                        {file.extractedText?.substring(0, 100)}...
-                                    </p>
-                                </div>
-                                {/* <button onClick={() => deleteFile(file.id)}>Delete</button> */}
+                            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+
+                                <a href={file.storageUrl} target="_blank" key={file.id} className="">
+                                    <div>
+                                        <p className="text-white">{file.name}</p>
+                                        <p className="text-xs text-purple-400/60">
+                                            {file.extractedText?.substring(0, 100)}...
+                                        </p>
+                                    </div>
+                                </a>
+                                <button onClick={() => deleteFile(file.id)}><Trash2 className="w-4 h-4 text-red-400 cursor-pointer" /></button>
                             </div>
                         ))}
                     </div>

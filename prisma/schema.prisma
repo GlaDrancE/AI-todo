@@ -78,3 +78,18 @@ model AIContext {
 
   @@map("ai_contexts")
 }
+
+model ContextEmbedding {
+  id          String                     @id
+  userId      String
+  contentType String // "profile" | "todo" | "contextFile" | "interaction"
+  contentId   String? // Reference to original content
+  text        String // The actual text that was embedded
+  embedding   Unsupported("vector(768)") // For Gemini embeddings
+  metadata    Json? // Store additional context
+  createdAt   DateTime                   @default(now())
+
+  @@index([userId])
+  @@index([contentType])
+  @@map("context_embeddings")
+}

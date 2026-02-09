@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { put } from "@vercel/blob"
 import FileParseService from "@/services/FileParseService"
+import { onFileUpload } from "@/utils/todo"
 
 const parser = new FileParseService();
 
@@ -29,6 +30,8 @@ export async function POST(request: Request) {
 
         const metaData = parser.extractMetadata(extractedText, file.type)
 
+
+
         const contextFile = await prisma.contextFile.create({
             data: {
                 userId,
@@ -40,6 +43,17 @@ export async function POST(request: Request) {
                 metadata: metaData
             }
         })
+        if (extractedText) {
+            const context = await prisma.contextEmbedding.findFirst({
+                where: {
+                    contentId: contextFile.id,
+                    contentType: "file_upload",
+                }
+            })
+            if (!context) {
+                await onFileUpload(userId, "file_upload", extractedText, contextFile.id, metaData)
+            }
+        }
         return NextResponse.json(contextFile);
     } catch (error) {
         console.log(error)
@@ -58,6 +72,22 @@ export async function GET() {
         })
         return NextResponse.json(contextFiles);
     } catch (error) {
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+    }
+}
+export async function DELETE(request: Request) {
+    try {
+        const { userId } = await auth();
+        if (!userId) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+        }
+        const { id } = await request.json();
+        console.log(id)
+        await prisma.contextFile.delete({ where: { id, userId } });
+        return NextResponse.json({ message: "File deleted" });
+    }
+    catch (error) {
+        console.log(error)
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
     }
 }

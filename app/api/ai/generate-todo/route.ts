@@ -12,6 +12,7 @@ export const GET = async (request: Request) => {
         const response = await aiContextService.generateTodo(userId)
         return NextResponse.json({ todos: response }, { status: 200 })
     } catch (error) {
+        console.error('Error generating todo:', error)
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
     }
 }

@@ -388,7 +388,8 @@ export const ModelName = {
   TodoFile: 'TodoFile',
   UserProfile: 'UserProfile',
   ContextFile: 'ContextFile',
-  AIContext: 'AIContext'
+  AIContext: 'AIContext',
+  ContextEmbedding: 'ContextEmbedding'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -404,7 +405,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "todo" | "todoFile" | "userProfile" | "contextFile" | "aIContext"
+    modelProps: "todo" | "todoFile" | "userProfile" | "contextFile" | "aIContext" | "contextEmbedding"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -778,6 +779,64 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ContextEmbedding: {
+      payload: Prisma.$ContextEmbeddingPayload<ExtArgs>
+      fields: Prisma.ContextEmbeddingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContextEmbeddingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextEmbeddingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContextEmbeddingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextEmbeddingPayload>
+        }
+        findFirst: {
+          args: Prisma.ContextEmbeddingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextEmbeddingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContextEmbeddingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextEmbeddingPayload>
+        }
+        findMany: {
+          args: Prisma.ContextEmbeddingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextEmbeddingPayload>[]
+        }
+        delete: {
+          args: Prisma.ContextEmbeddingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextEmbeddingPayload>
+        }
+        update: {
+          args: Prisma.ContextEmbeddingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextEmbeddingPayload>
+        }
+        deleteMany: {
+          args: Prisma.ContextEmbeddingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContextEmbeddingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContextEmbeddingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContextEmbeddingPayload>[]
+        }
+        aggregate: {
+          args: Prisma.ContextEmbeddingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContextEmbedding>
+        }
+        groupBy: {
+          args: Prisma.ContextEmbeddingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContextEmbeddingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContextEmbeddingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContextEmbeddingCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -880,6 +939,19 @@ export const AIContextScalarFieldEnum = {
 } as const
 
 export type AIContextScalarFieldEnum = (typeof AIContextScalarFieldEnum)[keyof typeof AIContextScalarFieldEnum]
+
+
+export const ContextEmbeddingScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  contentType: 'contentType',
+  contentId: 'contentId',
+  text: 'text',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type ContextEmbeddingScalarFieldEnum = (typeof ContextEmbeddingScalarFieldEnum)[keyof typeof ContextEmbeddingScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1105,6 +1177,7 @@ export type GlobalOmitConfig = {
   userProfile?: Prisma.UserProfileOmit
   contextFile?: Prisma.ContextFileOmit
   aIContext?: Prisma.AIContextOmit
+  contextEmbedding?: Prisma.ContextEmbeddingOmit
 }
 
 /* Types for Logging */

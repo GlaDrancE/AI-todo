@@ -1,18 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { GoogleGenAI } from "@google/genai"
+import EmbeddingService from "./EmbeddingService";
 const googleGenAI = new GoogleGenAI({ apiKey: process.env.GOOGLE_AI_API_KEY as string });
+const embeddingService = new EmbeddingService();
 class AIContextService {
-    async buildUserContext(userId: string): Promise<string> {
+    async buildUserContext(userId: string, userQuery: string): Promise<string> {
         const profile = await prisma.userProfile.findUnique({
             where: {
                 userId
             }
         })
-        const contextFiles = await prisma.contextFile.findMany({
-            where: {
-                userId
-            }
-        })
+        const relevantContext = await embeddingService.searchRelevantContext(userId, userQuery, 5)
 
         let context = `# User Profile\n\n`
         if (profile) {
@@ -21,17 +19,26 @@ class AIContextService {
             context += `## What I Want in Life\n${profile.whatIWantInLife || 'Not specified'}\n\n`;
         }
 
-        context += `# Context Files\n\n`;
+        // context += `# Context Files\n\n`;
 
-        for (const file of contextFiles) {
-            context += `## ${file.name} (${file.type})\n`;
-            context += `${file.extractedText || 'Content not extracted'}\n\n`;
-        }
-        return context;
+        // for (const file of contextFiles) {
+        //     context += `## ${file.name} (${file.type})\n`;
+        //     context += `${file.extractedText || 'Content not extracted'}\n\n`;
+        // }
+
+        context += "# Relevant Context (Retrieved):\n\n"
+        relevantContext.forEach((item, i) => {
+            console.log(item.similarity)
+            context += `${i + 1}. [${item.contentType}] ${item.text}\n\n`
+        })
+
+        return context
 
     }
     async generateTodo(userId: string, userPrompt?: string) {
-        const context = await this.buildUserContext(userId)
+        const prompt = userPrompt || "Generate daily todo list based on my goals";
+        const context = await this.buildUserContext(userId, prompt)
+        console.log("Context:", context)
         const systemInstruction = `
 You are an elite AI daily planning engine designed to help a human execute high-impact work consistently without burnout, delusion, or overplanning.
 
@@ -167,49 +174,84 @@ Generate the todo list now.
     }
     async analyzeTodo(userId: string, todoText: string) {
 
-        const context = await this.buildUserContext(userId)
+        const prompt = "Generate daily todo list based on my goals";
+        const context = await this.buildUserContext(userId, prompt)
         const systemInstruction = `
-You are a high-precision task evaluation engine.
+You are an elite AI productivity auditor and optimizer.
 
-Your job is to analyze a single todo item and determine how well it aligns with the user's goals, active projects, constraints, energy patterns, and current phase of execution.
+Your role is NOT to create a fresh plan from scratch, but to:
+• Analyze an existing daily todo list
+• Diagnose why it will fail or underperform
+• Then output an **improved, energy-aligned, realistic version** of the same day
 
-You must operate with ruthless objectivity. Do not assume the todo is useful just because it exists.
+You explicitly understand that:
+• Humans overestimate daily capacity
+• Cognitive energy is uneven and limited
+• Overloaded plans create avoidance, not execution
+• Productivity systems fail when they ignore recovery and buffers
 
-ANALYSIS RULES:
+INPUT YOU WILL RECEIVE:
+• A raw todo list written by a human (often overambitious, poorly ordered, or energy-blind)
 
-* Evaluate alignment with:
+YOUR JOB:
+1. Analyze the list for:
+   • Overload
+   • Poor energy alignment
+   • Missing buffers or recovery
+   • Task stacking of cognitively heavy items
+   • Low-leverage or fake-progress tasks
+   • Unrealistic sequencing
+2. Ruthlessly cut, merge, defer, or downgrade tasks where necessary.
+3. Reorder tasks by **execution priority and energy alignment**, not by importance fantasy.
+4. Preserve intent, but optimize for **completion and consistency**, not ambition.
+5. Output ONLY the improved todo list.
 
-  * The user's stated goals
-  * Ongoing projects and deadlines
-  * Current priorities and bottlenecks
-  * Known productivity patterns and energy windows
-* Penalize todos that are:
+STRICT OUTPUT RULES:
+1. Output ONLY a raw list of todo items.
+2. Each todo must be a single, concise, actionable sentence.
+3. No headers, explanations, emojis, or commentary.
+4. Todos must be ordered by execution priority.
+5. Maximum 4–6 meaningful tasks total.
 
-  * Vague or non-actionable
-  * Low leverage or busywork
-  * Poorly timed for the user's energy profile
-  * Redundant with higher-priority tasks
-* Reward todos that:
+ENERGY & REALISM RULES:
+• Use the default energy model unless overridden:
+  • Morning: highest cognitive output → deep work, revenue, strategy
+  • Early afternoon: lowest output → admin, learning, decompression
+  • Late afternoon/evening: moderate output → follow-ups, refinement
+• Never place deep work in low-energy periods.
+• Never stack heavy cognitive tasks back-to-back.
+• Always include:
+  • Morning routine
+  • Lunch + post-lunch decompression
+  • At least one buffer/emergency slot
+  • End-of-day wind-down
+• If the list is overloaded:
+  → Cut scope instead of compressing time.
 
-  * Drive revenue, proof of work, or momentum
-  * Reduce future cognitive load
-  * Clearly move an active project forward
-  * Can realistically be completed in one focused session
+PRIORITIZATION RULES:
+Ruthlessly favor tasks that:
+• Generate revenue
+• Create leverage (systems, assets, proof)
+• Reduce future mental load
+Deprioritize:
+• Busywork
+• Premature optimization
+• Tasks included to “feel productive”
 
-SCORING:
+FAILURE-AWARE LOGIC:
+• Assume yesterday’s plan may have failed.
+• If so:
+  • Reduce today’s scope
+  • Carry forward only the single highest-leverage task
+• Design the list as a **rail**, not a prison.
 
-* Output a relevance score from 0-100.
-* 90-100: Directly advances a top priority right now.
-* 70-89: Useful but could be better scoped or timed.
-* 40-69: Marginal value or misaligned with current priorities.
-* 0-39: Noise, distraction, or avoidance disguised as work.
+PSYCHOLOGICAL SAFEGUARDS:
+Assume the human:
+• Overthinks
+• Overloads days
+• Underestimates recovery
+Your optimization must counter these by default.
 
-IMPROVEMENT LOGIC:
-
-* If the todo is weak, rewrite it into a higher-leverage version.
-* If the todo is too large, reduce it to the single next concrete action.
-* If the todo is mistimed, suggest a version aligned to the user's energy window.
-* If the todo should not be done today, say so explicitly.
 
 OUTPUT FORMAT (STRICT):
 
@@ -218,7 +260,7 @@ Respond ONLY with valid JSON in the following structure:
 {
 "relevance_score": number,
 "reasoning": "concise, objective explanation",
-"improved_todo": "revised high-leverage version or null if no improvement needed",
+"improved_todo": "revised high-leverage version or null if no improvement needed points separated by semicolons",
 "recommended_time_window": "high-energy | medium-energy | low-energy | defer"
 }
 
@@ -230,15 +272,16 @@ CONSTRAINTS:
 * Do not soften criticism.
 * Be precise, not verbose.
 
-Evaluate the todo item now.
 
-        `;
+Now analyze the provided todo list and output the improved version.
+
+`;
 
         const userMessage = `User Context:\n${context}\n\nTodo to analyze: "${todoText}"\n\nProvide JSON response with: relevance (0-100), reasoning (string), and suggestions (array of strings).`;
 
         try {
             const response = await googleGenAI.models.generateContent({
-                model: 'gemini-2.5-flash-preview',
+                model: 'gemini-3-flash-preview',
                 contents: [
                     {
                         role: 'user',
@@ -251,8 +294,17 @@ Evaluate the todo item now.
                     }
                 }
             });
-            const text = response.text;
-            return text;
+            if (!response.text) {
+                return {
+                    relevance: 50,
+                    reasoning: "Unable to analyze due to error",
+                    suggestions: []
+                };
+            }
+            let jsonResponse = JSON.parse(response.text)
+            const improved_todo = jsonResponse.improved_todo.split(";")
+            jsonResponse = { ...jsonResponse, improved_todo: improved_todo }
+            return jsonResponse;
         } catch (error) {
             console.log("Error analyzing todo:", error)
             return {
