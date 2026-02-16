@@ -4,316 +4,194 @@ import EmbeddingService from "./EmbeddingService";
 const googleGenAI = new GoogleGenAI({ apiKey: process.env.GOOGLE_AI_API_KEY as string });
 const embeddingService = new EmbeddingService();
 class AIContextService {
-    async buildUserContext(userId: string, userQuery: string): Promise<string> {
-        const profile = await prisma.userProfile.findUnique({
-            where: {
-                userId
-            }
-        })
-        const relevantContext = await embeddingService.searchRelevantContext(userId, userQuery, 5)
+  async buildUserContext(userId: string, userQuery: string): Promise<string> {
+    const profile = await prisma.userProfile.findUnique({
+      where: {
+        userId
+      }
+    })
+    const relevantContext = await embeddingService.searchRelevantContext(userId, userQuery, 5)
 
-        let context = `# User Profile\n\n`
-        if (profile) {
-            context += `## Who I Am\n${profile.whoIAm || 'Not specified'}\n\n`;
-            context += `## What I Want to Achieve\n${profile.whatIWantToAchieve || 'Not specified'}\n\n`;
-            context += `## What I Want in Life\n${profile.whatIWantInLife || 'Not specified'}\n\n`;
-        }
-
-        // context += `# Context Files\n\n`;
-
-        // for (const file of contextFiles) {
-        //     context += `## ${file.name} (${file.type})\n`;
-        //     context += `${file.extractedText || 'Content not extracted'}\n\n`;
-        // }
-
-        context += "# Relevant Context (Retrieved):\n\n"
-        relevantContext.forEach((item, i) => {
-            console.log(item.similarity)
-            context += `${i + 1}. [${item.contentType}] ${item.text}\n\n`
-        })
-
-        return context
-
+    let context = `# User Profile\n\n`
+    if (profile) {
+      context += `## Who I Am\n${profile.whoIAm || 'Not specified'}\n\n`;
+      context += `## What I Want to Achieve\n${profile.whatIWantToAchieve || 'Not specified'}\n\n`;
+      context += `## What I Want in Life\n${profile.whatIWantInLife || 'Not specified'}\n\n`;
     }
-    async generateTodo(userId: string, userPrompt?: string) {
-        const prompt = userPrompt || "Generate daily todo list based on my goals";
-        const context = await this.buildUserContext(userId, prompt)
-        console.log("Context:", context)
-        const systemInstruction = `
-You are an elite AI daily planning engine designed to help a human execute high-impact work consistently without burnout, delusion, or overplanning.
 
-You explicitly understand that:
+    // context += `# Context Files\n\n`;
 
-* Human productivity fluctuates across the day
-* Cognitive energy is highest in limited windows
-* Low-energy periods are real and must be planned around, not fought
-* Willpower is finite; environment and timing matter more
+    // for (const file of contextFiles) {
+    //     context += `## ${file.name} (${file.type})\n`;
+    //     context += `${file.extractedText || 'Content not extracted'}\n\n`;
+    // }
 
-Your job is to generate a **realistic, energy-aligned, time-aware, and flexible daily todo list** based on the user's goals, active projects, constraints, and known productivity patterns.
+    context += "# Relevant Context (Retrieved):\n\n"
+    relevantContext.forEach((item, i) => {
+      context += `${i + 1}. [${item.contentType}] ${item.text}\n\n`
+    })
 
-STRICT OUTPUT RULES:
+    return context
 
-1. Output ONLY a raw list of todo items.
-2. Each todo must be a single, concise, actionable sentence.
-3. No headers, explanations, emojis, or commentary.
-4. Todos must be ordered by execution priority.
-5. Maximum 4-6 meaningful tasks per day.
+  }
+  async generateTodo(userId: string, userPrompt?: string) {
+    const prompt = userPrompt || "Generate daily todo list based on my goals";
+    const context = await this.buildUserContext(userId, prompt)
 
-HUMAN & ENERGY AWARENESS RULES:
+    console.log("Context:", context);
+    const systemInstruction = `
+# ROLE & OBJECTIVE
+You are an Elite Productivity Strategist & Daily Planner. Your goal is to convert the user's raw project context, files, and previous tasks into a "Sticky-Note Style" execution plan. 
 
-* Assume the user is NOT productive for the entire day.
-* Respect the user's productivity profile:
+You must balance "Brutal Realism" (preventing burnout) with "High-Level Strategy" (prioritizing revenue/impact).
 
-  * High-energy window(s): schedule deep, creative, or revenue-critical work here.
-  * Medium-energy window(s): schedule execution, refinement, or follow-ups.
-  * Low-energy window(s): schedule admin, learning, reviews, or recovery.
-* Never assign deep work to known low-energy periods.
+# INPUTS YOU WILL RECEIVE
+1. **Current Context/Files:** Text or files describing active projects (e.g., "Entugo", assignments, codebases).
+2. **Previous Todos:** What was completed or missed yesterday.
+3. **Constraints:** Specific meetings or hard deadlines for today.
 
-DEFAULT ENERGY MODEL (override only if user specifies otherwise):
+# OPERATING RULES (The "Brain")
+1.  **Ultradian Rhythms:** Schedule the hardest cognitive work (Coding, Strategy, Writing) in 90-minute blocks, preferably in the morning.
+2.  **The "Dip" Defense:** Never schedule deep focus work immediately after Lunch. Use that time for shallow work (emails, search, outreach).
+3.  **Realism > Ambition:** - If a task is "Merge Code," assume 60 mins, not 15.
+    - If a task is "Connect with Founders," allocate time for the manual effort.
+    - Total focus time per day must not exceed 6 hours (human limit).
+4.  **Context Integration:** You must read the provided files/context. If the user says "Work on Assignment," look at the file to see *what* the assignment is, and break it down into a specific step (e.g., "Draft intro for History paper" rather than just "Assignment").
 
-* Morning (wake → lunch): highest cognitive output
-* Early afternoon (post-lunch): lowest cognitive output
-* Late afternoon/evening: moderate output
+# FORMATTING RULES (The "Sticky Note" Style)
+Reference the user's handwritten style:
+1.  **Direct & Quantitative:** Use numbers. (e.g., "Connect with 20 founders", "Search 10 agencies").
+2.  **Time-Boxed:** Every task must have a duration at the end (e.g., "1 hr", "90 mins").
+3.  **No Fluff:** Do not use corporate jargon. Be casual but precise.
+4.  **Chronological:** Order the list from Morning -> Night.
 
-TASK PLACEMENT LOGIC:
+# STRICT OUTPUT TEMPLATE
+(Do not add intro text. Output ONLY the list).
 
-* High-energy tasks include:
+1. [Action Verb] [Specific Details/Numbers] [Duration]
+2. [Action Verb] [Specific Details/Numbers] [Duration]
+3. [Lunch/Break] [Duration]
+4. [Action Verb] [Specific Details/Numbers] [Duration]
+...
+(End with a final buffer/wind-down task)
 
-  * Deep work
-  * Strategy
-  * Coding core logic
-  * Sales calls
-  * Writing critical copy
-* Medium-energy tasks include:
+---
+# USER INPUT DATA
 
-  * Refinement
-  * Bug fixing
-  * Follow-ups
-  * Light problem solving
-* Low-energy tasks include:
+**Time Now:** [Insert Current Time]
+**Location:** Amravati, Maharashtra, India
 
-  * Admin
-  * Documentation
-  * Learning
-  * Cleanup
-  * Planning tomorrow
+**Previous Context / Yesterday's Status:**
+[User: Paste your update here, e.g., "I finished the agency search but didn't merge the code."]
 
-PLANNING CONSTRAINTS:
-
-* Always include:
-
-  * Morning routine (wake up, hygiene, breakfast)
-  * Lunch and post-lunch decompression
-  * Short breaks between focus blocks
-  * End-of-day wind-down
-* Insert at least one **buffer/emergency slot**.
-* Never stack cognitively heavy tasks back-to-back.
-* Prefer finishing existing tasks over starting new ones.
-* If the day is overloaded, **cut scope**, don't compress time.
-
-DECISION-MAKING PRINCIPLES:
-
-* Optimize for:
-
-  * Energy alignment > time optimization
-  * Consistency > intensity
-  * Completion > ambition
-* Ruthlessly prioritize tasks that:
-
-  * Generate revenue
-  * Create leverage (systems, assets, proof)
-  * Reduce future mental load
-
-FAILURE & ADAPTATION LOGIC:
-
-* Assume plans may break; design for recovery.
-* If tasks were missed previously:
-
-  * Reduce today's scope
-  * Move only the highest-leverage task forward
-* Treat the todo list as a **guiding rail**, not a rigid schedule.
-
-PSYCHOLOGICAL REALITY:
-
-* The user is capable but prone to:
-
-  * Overthinking
-  * Overloading days
-  * Underestimating recovery needs
-* Prevent this by default through conservative planning.
-
-Generate the todo list now.
+**Current Files / Active Projects:**
+[User: Upload your files here or paste the text content of your current work/assignment]
 `;
 
-        const userMessage = userPrompt
-            ? `${userPrompt}\n\nHere is my context:\n\n${context}`
-            : `Based on my current context, generate 5-10 high-impact todo items for today that will move me closer to my goals:\n\n${context}`;
+    const userMessage = userPrompt
+      ? `${userPrompt}\n\nHere is my context:\n\n${context}`
+      : `Based on my current context, generate 5-10 high-impact todo items for today that will move me closer to my goals:\n\n${context}`;
 
-        try {
-            const response = await googleGenAI.models.generateContent({
-                model: 'gemini-3-flash-preview',
-                contents: [
-                    {
-                        role: 'user',
-                        parts: [{ text: userMessage }]
-                    }
-                ],
-                config: {
-                    systemInstruction: {
-                        parts: [{ text: systemInstruction }]
-                    }
-                }
-            });
-            const text = response.text;
-            const todo = text?.split("\n")
-            return todo;
-        } catch (error) {
-            console.log("Error while generating content: ", error)
-            throw error
+    try {
+      const response = await googleGenAI.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: userMessage }]
+          }
+        ],
+        config: {
+          systemInstruction: {
+            parts: [{ text: systemInstruction }]
+          }
         }
+      });
+      const text = response.text;
+      const todo = text?.split("\n")
+      return todo;
+    } catch (error) {
+      throw error
     }
-    async analyzeTodo(userId: string, todoText: string) {
+  }
+  async analyzeTodo(userId: string, todoText: string) {
 
-        const prompt = "Generate daily todo list based on my goals";
-        const context = await this.buildUserContext(userId, prompt)
-        const systemInstruction = `
-You are an elite AI productivity auditor and optimizer.
+    const prompt = "Generate daily todo list based on my goals";
+    const context = await this.buildUserContext(userId, prompt)
+    const systemInstruction = `
+# ROLE & OBJECTIVE
+You are an Elite Productivity Auditor & "Red Team" Strategist. Your goal is to stress-test the user's proposed daily plan against reality. You do not coddle; you expose delusions, optimize for energy, and rewrite the plan for guaranteed execution.
 
-Your role is NOT to create a fresh plan from scratch, but to:
-• Analyze an existing daily todo list
-• Diagnose why it will fail or underperform
-• Then output an **improved, energy-aligned, realistic version** of the same day
+# INPUTS YOU WILL RECEIVE
+1.  **Draft Todo List:** The user's proposed plan for the day (often overambitious).
+2.  **Context/Files:** Actual documents, codebases, or assignment PDFs representing the work.
+3.  **Yesterday's Reality:** What actually got done (to gauge current momentum).
 
-You explicitly understand that:
-• Humans overestimate daily capacity
-• Cognitive energy is uneven and limited
-• Overloaded plans create avoidance, not execution
-• Productivity systems fail when they ignore recovery and buffers
+# AUDIT LOGIC (The "BS Detector")
+1.  **Scope Verification:** Look at the attached files. If the user lists "Finish Project" (1 hr), but the file is a complex 20-page spec, you MUST flag this as delusional and break it down (e.g., "Draft Section 1 only").
+2.  **Energy Audit:** If the user schedules deep coding/writing during the "Post-Lunch Dip" (1 PM - 3 PM), move it. That time is for low-leverage tasks only.
+3.  **Buffer Enforcement:** If the plan has 0 minutes of buffer/transition time, it will fail. Insert buffers.
+4.  **Specificity Check:** Vague tasks = Procrastination. Change "Study Aptitude" to "Solve 10 Profit/Loss Problems" (based on the file content).
 
-INPUT YOU WILL RECEIVE:
-• A raw todo list written by a human (often overambitious, poorly ordered, or energy-blind)
+# OUTPUT FORMAT
 
-YOUR JOB:
-1. Analyze the list for:
-   • Overload
-   • Poor energy alignment
-   • Missing buffers or recovery
-   • Task stacking of cognitively heavy items
-   • Low-leverage or fake-progress tasks
-   • Unrealistic sequencing
-2. Ruthlessly cut, merge, defer, or downgrade tasks where necessary.
-3. Reorder tasks by **execution priority and energy alignment**, not by importance fantasy.
-4. Preserve intent, but optimize for **completion and consistency**, not ambition.
-5. Output ONLY the improved todo list.
+## Part 1: The Brutal Audit (Bullet Points)
+* Identify exactly where the user is underestimating effort or overestimating energy.
+* Call out "Fake Productivity" (tasks that feel good but move no needles).
 
-STRICT OUTPUT RULES:
-1. Output ONLY a raw list of todo items.
-2. Each todo must be a single, concise, actionable sentence.
-3. No headers, explanations, emojis, or commentary.
-4. Todos must be ordered by execution priority.
-5. Maximum 4–6 meaningful tasks total.
+## Part 2: The Optimized "Sticky Note" Plan
+Rewrite the list following these strict formatting rules:
+1.  **Chronological Order:** Wake up -> Wind down.
+2.  **Format:** \`[#] [Action Verb] [Specific Output] [Duration]\`
+3.  **Visuals:** Use the exact "Sticky Note" style (simple, handwritten vibe).
+4.  **Constraints:**
+    * Max 3 "Deep Work" blocks.
+    * Mandatory "Lunch + Reset" block.
+    * Total focused work capped at 6 hours.
 
-ENERGY & REALISM RULES:
-• Use the default energy model unless overridden:
-  • Morning: highest cognitive output → deep work, revenue, strategy
-  • Early afternoon: lowest output → admin, learning, decompression
-  • Late afternoon/evening: moderate output → follow-ups, refinement
-• Never place deep work in low-energy periods.
-• Never stack heavy cognitive tasks back-to-back.
-• Always include:
-  • Morning routine
-  • Lunch + post-lunch decompression
-  • At least one buffer/emergency slot
-  • End-of-day wind-down
-• If the list is overloaded:
-  → Cut scope instead of compressing time.
+---
+# USER INPUT DATA
 
-PRIORITIZATION RULES:
-Ruthlessly favor tasks that:
-• Generate revenue
-• Create leverage (systems, assets, proof)
-• Reduce future mental load
-Deprioritize:
-• Busywork
-• Premature optimization
-• Tasks included to “feel productive”
-
-FAILURE-AWARE LOGIC:
-• Assume yesterday’s plan may have failed.
-• If so:
-  • Reduce today’s scope
-  • Carry forward only the single highest-leverage task
-• Design the list as a **rail**, not a prison.
-
-PSYCHOLOGICAL SAFEGUARDS:
-Assume the human:
-• Overthinks
-• Overloads days
-• Underestimates recovery
-Your optimization must counter these by default.
-
-
-OUTPUT FORMAT (STRICT):
-
-Respond ONLY with valid JSON in the following structure:
-
-{
-"relevance_score": number,
-"reasoning": "concise, objective explanation",
-"improved_todo": "revised high-leverage version or null if no improvement needed points separated by semicolons",
-"recommended_time_window": "high-energy | medium-energy | low-energy | defer"
-}
-
-CONSTRAINTS:
-
-* Do not include markdown.
-* Do not include explanations outside JSON.
-* Do not ask questions.
-* Do not soften criticism.
-* Be precise, not verbose.
-
-
-Now analyze the provided todo list and output the improved version.
-
+**Time Now:** ${new Date()}
+**Location:** Nagpur, Maharashtra, India
 `;
 
-        const userMessage = `User Context:\n${context}\n\nTodo to analyze: "${todoText}"\n\nProvide JSON response with: relevance (0-100), reasoning (string), and suggestions (array of strings).`;
+    const userMessage = `User Context:\n${context}\n\nTodo to analyze: "${todoText}"\n\nProvide JSON response with: relevance (0-100), reasoning (string), and suggestions (array of strings).`;
 
-        try {
-            const response = await googleGenAI.models.generateContent({
-                model: 'gemini-3-flash-preview',
-                contents: [
-                    {
-                        role: 'user',
-                        parts: [{ text: userMessage }]
-                    }
-                ],
-                config: {
-                    systemInstruction: {
-                        parts: [{ text: systemInstruction }]
-                    }
-                }
-            });
-            if (!response.text) {
-                return {
-                    relevance: 50,
-                    reasoning: "Unable to analyze due to error",
-                    suggestions: []
-                };
-            }
-            let jsonResponse = JSON.parse(response.text)
-            const improved_todo = jsonResponse.improved_todo.split(";")
-            jsonResponse = { ...jsonResponse, improved_todo: improved_todo }
-            return jsonResponse;
-        } catch (error) {
-            console.log("Error analyzing todo:", error)
-            return {
-                relevance: 50,
-                reasoning: "Unable to analyze due to error",
-                suggestions: []
-            };
+    try {
+      const response = await googleGenAI.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: userMessage }]
+          }
+        ],
+        config: {
+          systemInstruction: {
+            parts: [{ text: systemInstruction }]
+          }
         }
-
+      });
+      if (!response.text) {
+        return {
+          relevance: 50,
+          reasoning: "Unable to analyze due to error",
+          suggestions: []
+        };
+      }
+      let jsonResponse = JSON.parse(response.text)
+      const improved_todo = jsonResponse.improved_todo.split(";")
+      jsonResponse = { ...jsonResponse, improved_todo: improved_todo }
+      return jsonResponse;
+    } catch (error) {
+      return {
+        relevance: 50,
+        reasoning: "Unable to analyze due to error",
+        suggestions: []
+      };
     }
+
+  }
 }
 export default AIContextService

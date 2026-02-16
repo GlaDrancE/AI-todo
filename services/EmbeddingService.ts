@@ -18,9 +18,13 @@ class EmbeddingService {
         contentId?: string,
         metadata?: any
     ) {
-        const embedding = await this.generateEmbedding(text)
-        console.log("Storing embedding:", embedding?.slice(0, 5), "... (showing first 5 values)");
 
+        const embedding = await Promise.race([
+            this.generateEmbedding(text),
+            new Promise((_, reject) => (
+                setTimeout(() => (reject("Embedding generation timed out")), 10000)
+            ))
+        ]) as number[]
         const vectorString = `[${embedding?.join(',')}]`;
 
 

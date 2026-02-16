@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
-
+import EmbeddingService from "@/services/EmbeddingService"
+const embeddingService = new EmbeddingService();
 export async function GET() {
     try {
         const { userId } = await auth();
@@ -45,6 +46,8 @@ export async function POST(request: Request) {
                 userId, text,
             }
         })
+        embeddingService.storeEmbedding(userId, "todo_created", text, todo.id,
+            { createdAt: todo.createdAt, completed: false }).catch(err => console.error("Failed to store embeddings", err))
         return NextResponse.json(todo)
     } catch (error) {
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })

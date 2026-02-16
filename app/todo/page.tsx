@@ -26,6 +26,7 @@ interface Todo {
 function TodoComponent() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [inputValue, setInputValue] = useState("");
+  const [userPrompt, setUserPrompt] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const { user, isLoaded } = useUser()
   const [isLoading, setIsLoading] = useState(false);
@@ -160,7 +161,11 @@ function TodoComponent() {
   const handleGenerateTodo = async () => {
     setIsGeneratingTodo(true);
     try {
-      const response = await fetch("/api/ai/generate-todo")
+      const response = await fetch("/api/ai/generate-todo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userPrompt: userPrompt })
+      })
       const data = await response.json();
       const todos = data.todos.map((todo: string) => ({
         id: crypto.randomUUID(),
@@ -396,6 +401,15 @@ function TodoComponent() {
 
         {/* AI Action Buttons */}
         <div className="flex justify-center gap-4 mt-8 mb-6">
+          <input
+            type="text"
+            value={userPrompt}
+            onChange={(e) => setUserPrompt(e.target.value)}
+            placeholder="Enter your prompt..."
+            className="w-full px-4 py-3 bg-white/5 border border-purple-500/30 rounded-lg 
+                       text-white placeholder-purple-300/50 focus:outline-none focus:ring-2 
+                       focus:ring-purple-500/50 focus:border-transparent backdrop-blur-sm"
+          />
           <button
             onClick={handleGenerateTodo}
             disabled={isGeneratingTodo}
@@ -405,7 +419,7 @@ function TodoComponent() {
                      border border-cyan-500/30 backdrop-blur-sm
                      ${isGeneratingTodo ? 'opacity-50 cursor-not-allowed scale-100 hover:scale-100' : ''}`}
           >
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-2 text-nowrap">
               {isGeneratingTodo ? (
                 <>
                   <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -430,7 +444,7 @@ function TodoComponent() {
                      border border-purple-500/30 backdrop-blur-sm
                      ${isAnalyzingTodo || todos.length === 0 ? 'opacity-50 cursor-not-allowed scale-100 hover:scale-100' : ''}`}
           >
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-2 text-nowrap">
               {isAnalyzingTodo ? (
                 <>
                   <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
