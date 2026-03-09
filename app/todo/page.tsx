@@ -21,15 +21,27 @@ interface Todo {
   completed: boolean;
   files: TodoFile[];
   createdAt: Date;
+  priority?: number;
+  scheduledFor?: string | Date | null;
 }
 
 function TodoComponent() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [inputValue, setInputValue] = useState("");
+  const [lastPriority, setLastPriority] = useState<number>(() => {
+    if (typeof window === "undefined") return 0;
+    const stored = window.localStorage.getItem("lastPriority");
+    const parsed = stored ? parseInt(stored, 10) : 0;
+    return Number.isFinite(parsed) ? parsed : 0;
+  });
+  const [scheduledFor, setScheduledFor] = useState("");
+  const [estimatedMinutes, setEstimatedMinutes] = useState("30");
+  const [category, setCategory] = useState("");
   const [userPrompt, setUserPrompt] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const { user, isLoaded } = useUser()
   const [isLoading, setIsLoading] = useState(false);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   const [showApprovalDialog, setShowApprovalDialog] = useState(false);
   const [improvedTodos, setImprovedTodos] = useState<Todo[]>([]);
   const [isGeneratingTodo, setIsGeneratingTodo] = useState(false);
@@ -44,7 +56,14 @@ function TodoComponent() {
       const response = await fetch('/api/todo');
       if (response.ok) {
         const data = await response.json();
-        setTodos(data);
+        const sorted = [...data].sort((a: Todo, b: Todo) => {
+          // Sort by priority if present, otherwise fallback to createdAt
+          if (a.priority != null && b.priority != null) {
+            return a.priority - b.priority;
+          }
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        });
+        setTodos(sorted);
       }
     } catch (error) {
       console.error('Error fetching todos:', error);
@@ -57,6 +76,7 @@ function TodoComponent() {
     if (inputValue.trim() === "" || isLoading) return;
 
     setIsLoading(true);
+    const nextPriority = (lastPriority || 0) + 1;
     try {
       const filesData = selectedFiles.map((file) => ({
         name: file.name,
@@ -65,18 +85,31 @@ function TodoComponent() {
         url: URL.createObjectURL(file), // In production, upload to storage first
       }));
 
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("lastPriority", String(nextPriority));
+      }
+
       const response = await fetch('/api/todo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: inputValue,
+          priority: nextPriority,
+          scheduledFor: scheduledFor ? new Date(scheduledFor).toISOString() : null,
+          status: "SCHEDULED",
+          completionEstimatedMinutes: Number(estimatedMinutes) || 0,
+          category,
           files: filesData,
         }),
       });
 
       if (response.ok) {
         await fetchTodos();
+        setLastPriority(nextPriority);
         setInputValue("");
+        setScheduledFor("");
+        setEstimatedMinutes("30");
+        setCategory("");
         setSelectedFiles([]);
       }
     } catch (error) {
@@ -126,6 +159,47 @@ function TodoComponent() {
       }
     } catch (error) {
       console.error('Error toggling todo:', error);
+    }
+  };
+
+  // Drag and drop handlers for reordering (rescheduling by priority)
+  const handleDragStart = (id: string) => {
+    setDraggingId(id);
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>, targetId: string) => {
+    event.preventDefault();
+    if (!draggingId || draggingId === targetId) return;
+
+    setTodos((current) => {
+      const draggedIndex = current.findIndex((t) => t.id === draggingId);
+      const targetIndex = current.findIndex((t) => t.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return current;
+
+      const updated = [...current];
+      const [moved] = updated.splice(draggedIndex, 1);
+      updated.splice(targetIndex, 0, moved);
+      return updated;
+    });
+  };
+
+  const handleDragEnd = async () => {
+    setDraggingId(null);
+    try {
+      const updates = todos.map((todo, index) => ({
+        id: todo.id,
+        priority: index + 1,
+      }));
+
+      await fetch("/api/todo/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ updates }),
+      });
+
+      await fetchTodos();
+    } catch (error) {
+      console.error("Error reordering todos:", error);
     }
   };
 
@@ -274,6 +348,54 @@ function TodoComponent() {
                        focus:ring-purple-500/50 focus:border-transparent backdrop-blur-sm"
             />
 
+            {/* Task metadata inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm text-purple-200 mb-1">
+                  Scheduled for
+                </label>
+                <input
+                  type="datetime-local"
+                  value={scheduledFor}
+                  onChange={(e) => setScheduledFor(e.target.value)}
+                  className="w-full px-3 py-2 bg-white/5 border border-purple-500/30 rounded-lg 
+                           text-white placeholder-purple-300/50 focus:outline-none focus:ring-2 
+                           focus:ring-purple-500/50 focus:border-transparent backdrop-blur-sm text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-purple-200 mb-1">
+                  Estimate (minutes)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={estimatedMinutes}
+                  onChange={(e) => setEstimatedMinutes(e.target.value)}
+                  className="w-full px-3 py-2 bg-white/5 border border-purple-500/30 rounded-lg 
+                           text-white placeholder-purple-300/50 focus:outline-none focus:ring-2 
+                           focus:ring-purple-500/50 focus:border-transparent backdrop-blur-sm text-sm"
+                  placeholder="e.g. 30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-purple-200 mb-1">
+                  Category
+                </label>
+                <input
+                  type="text"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full px-3 py-2 bg-white/5 border border-purple-500/30 rounded-lg 
+                           text-white placeholder-purple-300/50 focus:outline-none focus:ring-2 
+                           focus:ring-purple-500/50 focus:border-transparent backdrop-blur-sm text-sm"
+                  placeholder="e.g. Work, Personal"
+                />
+              </div>
+            </div>
+
             {/* File Upload */}
             <div className="flex items-center gap-4">
               {/* <label className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 
@@ -337,8 +459,12 @@ function TodoComponent() {
             todos.map((todo) => (
               <div
                 key={todo.id}
+                draggable
+                onDragStart={() => handleDragStart(todo.id)}
+                onDragOver={(e) => handleDragOver(e, todo.id)}
+                onDragEnd={handleDragEnd}
                 className={`cosmic-card p-4 transition-all transform hover:scale-[1.01] ${todo.completed ? "opacity-60" : ""
-                  }`}
+                  } ${draggingId === todo.id ? "ring-2 ring-purple-400" : ""}`}
               >
                 <div className="flex items-start gap-4">
                   {/* Checkbox */}

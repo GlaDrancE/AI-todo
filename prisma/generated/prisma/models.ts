@@ -9,6 +9,11 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Todo'
+export type * from './models/TasksCategory'
+export type * from './models/TaskEvent'
+export type * from './models/DailyUserMetrics'
+export type * from './models/CategoryMetrics'
+export type * from './models/HourlyProductivityMetrics'
 export type * from './models/TodoFile'
 export type * from './models/UserProfile'
 export type * from './models/ContextFile'

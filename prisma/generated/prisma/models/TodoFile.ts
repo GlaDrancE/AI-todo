@@ -447,14 +447,6 @@ export type TodoFileUncheckedUpdateManyWithoutTodoNestedInput = {
   deleteMany?: Prisma.TodoFileScalarWhereInput | Prisma.TodoFileScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type TodoFileCreateWithoutTodoInput = {
   id?: string
   name: string

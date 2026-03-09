@@ -20,8 +20,22 @@ export type TodoModel = runtime.Types.Result.DefaultSelection<Prisma.$TodoPayloa
 
 export type AggregateTodo = {
   _count: TodoCountAggregateOutputType | null
+  _avg: TodoAvgAggregateOutputType | null
+  _sum: TodoSumAggregateOutputType | null
   _min: TodoMinAggregateOutputType | null
   _max: TodoMaxAggregateOutputType | null
+}
+
+export type TodoAvgAggregateOutputType = {
+  priority: number | null
+  rescheduledCount: number | null
+  completionEstimatedMinutes: number | null
+}
+
+export type TodoSumAggregateOutputType = {
+  priority: number | null
+  rescheduledCount: number | null
+  completionEstimatedMinutes: number | null
 }
 
 export type TodoMinAggregateOutputType = {
@@ -29,8 +43,15 @@ export type TodoMinAggregateOutputType = {
   userId: string | null
   text: string | null
   completed: boolean | null
+  priority: number | null
+  scheduledFor: Date | null
+  status: $Enums.TodoStatus | null
+  rescheduledCount: number | null
+  completionEstimatedMinutes: number | null
+  deleted: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
+  tasksCategoryId: string | null
 }
 
 export type TodoMaxAggregateOutputType = {
@@ -38,8 +59,15 @@ export type TodoMaxAggregateOutputType = {
   userId: string | null
   text: string | null
   completed: boolean | null
+  priority: number | null
+  scheduledFor: Date | null
+  status: $Enums.TodoStatus | null
+  rescheduledCount: number | null
+  completionEstimatedMinutes: number | null
+  deleted: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
+  tasksCategoryId: string | null
 }
 
 export type TodoCountAggregateOutputType = {
@@ -47,19 +75,45 @@ export type TodoCountAggregateOutputType = {
   userId: number
   text: number
   completed: number
+  priority: number
+  scheduledFor: number
+  status: number
+  rescheduledCount: number
+  completionEstimatedMinutes: number
+  deleted: number
   createdAt: number
   updatedAt: number
+  tasksCategoryId: number
   _all: number
 }
 
+
+export type TodoAvgAggregateInputType = {
+  priority?: true
+  rescheduledCount?: true
+  completionEstimatedMinutes?: true
+}
+
+export type TodoSumAggregateInputType = {
+  priority?: true
+  rescheduledCount?: true
+  completionEstimatedMinutes?: true
+}
 
 export type TodoMinAggregateInputType = {
   id?: true
   userId?: true
   text?: true
   completed?: true
+  priority?: true
+  scheduledFor?: true
+  status?: true
+  rescheduledCount?: true
+  completionEstimatedMinutes?: true
+  deleted?: true
   createdAt?: true
   updatedAt?: true
+  tasksCategoryId?: true
 }
 
 export type TodoMaxAggregateInputType = {
@@ -67,8 +121,15 @@ export type TodoMaxAggregateInputType = {
   userId?: true
   text?: true
   completed?: true
+  priority?: true
+  scheduledFor?: true
+  status?: true
+  rescheduledCount?: true
+  completionEstimatedMinutes?: true
+  deleted?: true
   createdAt?: true
   updatedAt?: true
+  tasksCategoryId?: true
 }
 
 export type TodoCountAggregateInputType = {
@@ -76,8 +137,15 @@ export type TodoCountAggregateInputType = {
   userId?: true
   text?: true
   completed?: true
+  priority?: true
+  scheduledFor?: true
+  status?: true
+  rescheduledCount?: true
+  completionEstimatedMinutes?: true
+  deleted?: true
   createdAt?: true
   updatedAt?: true
+  tasksCategoryId?: true
   _all?: true
 }
 
@@ -119,6 +187,18 @@ export type TodoAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: TodoAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: TodoSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: TodoMinAggregateInputType
@@ -149,6 +229,8 @@ export type TodoGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: TodoCountAggregateInputType | true
+  _avg?: TodoAvgAggregateInputType
+  _sum?: TodoSumAggregateInputType
   _min?: TodoMinAggregateInputType
   _max?: TodoMaxAggregateInputType
 }
@@ -158,9 +240,18 @@ export type TodoGroupByOutputType = {
   userId: string
   text: string
   completed: boolean
+  priority: number
+  scheduledFor: Date
+  status: $Enums.TodoStatus
+  rescheduledCount: number
+  completionEstimatedMinutes: number
+  deleted: boolean | null
   createdAt: Date
   updatedAt: Date
+  tasksCategoryId: string
   _count: TodoCountAggregateOutputType | null
+  _avg: TodoAvgAggregateOutputType | null
+  _sum: TodoSumAggregateOutputType | null
   _min: TodoMinAggregateOutputType | null
   _max: TodoMaxAggregateOutputType | null
 }
@@ -188,9 +279,18 @@ export type TodoWhereInput = {
   userId?: Prisma.StringFilter<"Todo"> | string
   text?: Prisma.StringFilter<"Todo"> | string
   completed?: Prisma.BoolFilter<"Todo"> | boolean
+  priority?: Prisma.IntFilter<"Todo"> | number
+  scheduledFor?: Prisma.DateTimeFilter<"Todo"> | Date | string
+  status?: Prisma.EnumTodoStatusFilter<"Todo"> | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFilter<"Todo"> | number
+  completionEstimatedMinutes?: Prisma.IntFilter<"Todo"> | number
+  deleted?: Prisma.BoolNullableFilter<"Todo"> | boolean | null
   createdAt?: Prisma.DateTimeFilter<"Todo"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Todo"> | Date | string
+  tasksCategoryId?: Prisma.StringFilter<"Todo"> | string
   files?: Prisma.TodoFileListRelationFilter
+  category?: Prisma.XOR<Prisma.TasksCategoryScalarRelationFilter, Prisma.TasksCategoryWhereInput>
+  taskEvent?: Prisma.TaskEventListRelationFilter
 }
 
 export type TodoOrderByWithRelationInput = {
@@ -198,9 +298,18 @@ export type TodoOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   text?: Prisma.SortOrder
   completed?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  scheduledFor?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  rescheduledCount?: Prisma.SortOrder
+  completionEstimatedMinutes?: Prisma.SortOrder
+  deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  tasksCategoryId?: Prisma.SortOrder
   files?: Prisma.TodoFileOrderByRelationAggregateInput
+  category?: Prisma.TasksCategoryOrderByWithRelationInput
+  taskEvent?: Prisma.TaskEventOrderByRelationAggregateInput
 }
 
 export type TodoWhereUniqueInput = Prisma.AtLeast<{
@@ -211,9 +320,18 @@ export type TodoWhereUniqueInput = Prisma.AtLeast<{
   userId?: Prisma.StringFilter<"Todo"> | string
   text?: Prisma.StringFilter<"Todo"> | string
   completed?: Prisma.BoolFilter<"Todo"> | boolean
+  priority?: Prisma.IntFilter<"Todo"> | number
+  scheduledFor?: Prisma.DateTimeFilter<"Todo"> | Date | string
+  status?: Prisma.EnumTodoStatusFilter<"Todo"> | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFilter<"Todo"> | number
+  completionEstimatedMinutes?: Prisma.IntFilter<"Todo"> | number
+  deleted?: Prisma.BoolNullableFilter<"Todo"> | boolean | null
   createdAt?: Prisma.DateTimeFilter<"Todo"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Todo"> | Date | string
+  tasksCategoryId?: Prisma.StringFilter<"Todo"> | string
   files?: Prisma.TodoFileListRelationFilter
+  category?: Prisma.XOR<Prisma.TasksCategoryScalarRelationFilter, Prisma.TasksCategoryWhereInput>
+  taskEvent?: Prisma.TaskEventListRelationFilter
 }, "id">
 
 export type TodoOrderByWithAggregationInput = {
@@ -221,11 +339,20 @@ export type TodoOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   text?: Prisma.SortOrder
   completed?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  scheduledFor?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  rescheduledCount?: Prisma.SortOrder
+  completionEstimatedMinutes?: Prisma.SortOrder
+  deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  tasksCategoryId?: Prisma.SortOrder
   _count?: Prisma.TodoCountOrderByAggregateInput
+  _avg?: Prisma.TodoAvgOrderByAggregateInput
   _max?: Prisma.TodoMaxOrderByAggregateInput
   _min?: Prisma.TodoMinOrderByAggregateInput
+  _sum?: Prisma.TodoSumOrderByAggregateInput
 }
 
 export type TodoScalarWhereWithAggregatesInput = {
@@ -236,8 +363,15 @@ export type TodoScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"Todo"> | string
   text?: Prisma.StringWithAggregatesFilter<"Todo"> | string
   completed?: Prisma.BoolWithAggregatesFilter<"Todo"> | boolean
+  priority?: Prisma.IntWithAggregatesFilter<"Todo"> | number
+  scheduledFor?: Prisma.DateTimeWithAggregatesFilter<"Todo"> | Date | string
+  status?: Prisma.EnumTodoStatusWithAggregatesFilter<"Todo"> | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntWithAggregatesFilter<"Todo"> | number
+  completionEstimatedMinutes?: Prisma.IntWithAggregatesFilter<"Todo"> | number
+  deleted?: Prisma.BoolNullableWithAggregatesFilter<"Todo"> | boolean | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Todo"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Todo"> | Date | string
+  tasksCategoryId?: Prisma.StringWithAggregatesFilter<"Todo"> | string
 }
 
 export type TodoCreateInput = {
@@ -245,9 +379,17 @@ export type TodoCreateInput = {
   userId: string
   text: string
   completed?: boolean
+  priority: number
+  scheduledFor: Date | string
+  status: $Enums.TodoStatus
+  rescheduledCount?: number
+  completionEstimatedMinutes: number
+  deleted?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
   files?: Prisma.TodoFileCreateNestedManyWithoutTodoInput
+  category: Prisma.TasksCategoryCreateNestedOneWithoutTodoInput
+  taskEvent?: Prisma.TaskEventCreateNestedManyWithoutTodoInput
 }
 
 export type TodoUncheckedCreateInput = {
@@ -255,9 +397,17 @@ export type TodoUncheckedCreateInput = {
   userId: string
   text: string
   completed?: boolean
+  priority: number
+  scheduledFor: Date | string
+  status: $Enums.TodoStatus
+  rescheduledCount?: number
+  completionEstimatedMinutes: number
+  deleted?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tasksCategoryId: string
   files?: Prisma.TodoFileUncheckedCreateNestedManyWithoutTodoInput
+  taskEvent?: Prisma.TaskEventUncheckedCreateNestedManyWithoutTodoInput
 }
 
 export type TodoUpdateInput = {
@@ -265,9 +415,17 @@ export type TodoUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduledFor?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFieldUpdateOperationsInput | number
+  completionEstimatedMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   files?: Prisma.TodoFileUpdateManyWithoutTodoNestedInput
+  category?: Prisma.TasksCategoryUpdateOneRequiredWithoutTodoNestedInput
+  taskEvent?: Prisma.TaskEventUpdateManyWithoutTodoNestedInput
 }
 
 export type TodoUncheckedUpdateInput = {
@@ -275,9 +433,17 @@ export type TodoUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduledFor?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFieldUpdateOperationsInput | number
+  completionEstimatedMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasksCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
   files?: Prisma.TodoFileUncheckedUpdateManyWithoutTodoNestedInput
+  taskEvent?: Prisma.TaskEventUncheckedUpdateManyWithoutTodoNestedInput
 }
 
 export type TodoCreateManyInput = {
@@ -285,8 +451,15 @@ export type TodoCreateManyInput = {
   userId: string
   text: string
   completed?: boolean
+  priority: number
+  scheduledFor: Date | string
+  status: $Enums.TodoStatus
+  rescheduledCount?: number
+  completionEstimatedMinutes: number
+  deleted?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tasksCategoryId: string
 }
 
 export type TodoUpdateManyMutationInput = {
@@ -294,6 +467,12 @@ export type TodoUpdateManyMutationInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduledFor?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFieldUpdateOperationsInput | number
+  completionEstimatedMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -303,8 +482,15 @@ export type TodoUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduledFor?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFieldUpdateOperationsInput | number
+  completionEstimatedMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasksCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TodoCountOrderByAggregateInput = {
@@ -312,8 +498,21 @@ export type TodoCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   text?: Prisma.SortOrder
   completed?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  scheduledFor?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  rescheduledCount?: Prisma.SortOrder
+  completionEstimatedMinutes?: Prisma.SortOrder
+  deleted?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  tasksCategoryId?: Prisma.SortOrder
+}
+
+export type TodoAvgOrderByAggregateInput = {
+  priority?: Prisma.SortOrder
+  rescheduledCount?: Prisma.SortOrder
+  completionEstimatedMinutes?: Prisma.SortOrder
 }
 
 export type TodoMaxOrderByAggregateInput = {
@@ -321,8 +520,15 @@ export type TodoMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   text?: Prisma.SortOrder
   completed?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  scheduledFor?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  rescheduledCount?: Prisma.SortOrder
+  completionEstimatedMinutes?: Prisma.SortOrder
+  deleted?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  tasksCategoryId?: Prisma.SortOrder
 }
 
 export type TodoMinOrderByAggregateInput = {
@@ -330,8 +536,31 @@ export type TodoMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   text?: Prisma.SortOrder
   completed?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  scheduledFor?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  rescheduledCount?: Prisma.SortOrder
+  completionEstimatedMinutes?: Prisma.SortOrder
+  deleted?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  tasksCategoryId?: Prisma.SortOrder
+}
+
+export type TodoSumOrderByAggregateInput = {
+  priority?: Prisma.SortOrder
+  rescheduledCount?: Prisma.SortOrder
+  completionEstimatedMinutes?: Prisma.SortOrder
+}
+
+export type TodoListRelationFilter = {
+  every?: Prisma.TodoWhereInput
+  some?: Prisma.TodoWhereInput
+  none?: Prisma.TodoWhereInput
+}
+
+export type TodoOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type TodoScalarRelationFilter = {
@@ -347,8 +576,80 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type EnumTodoStatusFieldUpdateOperationsInput = {
+  set?: $Enums.TodoStatus
+}
+
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
+}
+
+export type TodoCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.TodoCreateWithoutCategoryInput, Prisma.TodoUncheckedCreateWithoutCategoryInput> | Prisma.TodoCreateWithoutCategoryInput[] | Prisma.TodoUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.TodoCreateOrConnectWithoutCategoryInput | Prisma.TodoCreateOrConnectWithoutCategoryInput[]
+  createMany?: Prisma.TodoCreateManyCategoryInputEnvelope
+  connect?: Prisma.TodoWhereUniqueInput | Prisma.TodoWhereUniqueInput[]
+}
+
+export type TodoUncheckedCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.TodoCreateWithoutCategoryInput, Prisma.TodoUncheckedCreateWithoutCategoryInput> | Prisma.TodoCreateWithoutCategoryInput[] | Prisma.TodoUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.TodoCreateOrConnectWithoutCategoryInput | Prisma.TodoCreateOrConnectWithoutCategoryInput[]
+  createMany?: Prisma.TodoCreateManyCategoryInputEnvelope
+  connect?: Prisma.TodoWhereUniqueInput | Prisma.TodoWhereUniqueInput[]
+}
+
+export type TodoUpdateManyWithoutCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.TodoCreateWithoutCategoryInput, Prisma.TodoUncheckedCreateWithoutCategoryInput> | Prisma.TodoCreateWithoutCategoryInput[] | Prisma.TodoUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.TodoCreateOrConnectWithoutCategoryInput | Prisma.TodoCreateOrConnectWithoutCategoryInput[]
+  upsert?: Prisma.TodoUpsertWithWhereUniqueWithoutCategoryInput | Prisma.TodoUpsertWithWhereUniqueWithoutCategoryInput[]
+  createMany?: Prisma.TodoCreateManyCategoryInputEnvelope
+  set?: Prisma.TodoWhereUniqueInput | Prisma.TodoWhereUniqueInput[]
+  disconnect?: Prisma.TodoWhereUniqueInput | Prisma.TodoWhereUniqueInput[]
+  delete?: Prisma.TodoWhereUniqueInput | Prisma.TodoWhereUniqueInput[]
+  connect?: Prisma.TodoWhereUniqueInput | Prisma.TodoWhereUniqueInput[]
+  update?: Prisma.TodoUpdateWithWhereUniqueWithoutCategoryInput | Prisma.TodoUpdateWithWhereUniqueWithoutCategoryInput[]
+  updateMany?: Prisma.TodoUpdateManyWithWhereWithoutCategoryInput | Prisma.TodoUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.TodoScalarWhereInput | Prisma.TodoScalarWhereInput[]
+}
+
+export type TodoUncheckedUpdateManyWithoutCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.TodoCreateWithoutCategoryInput, Prisma.TodoUncheckedCreateWithoutCategoryInput> | Prisma.TodoCreateWithoutCategoryInput[] | Prisma.TodoUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.TodoCreateOrConnectWithoutCategoryInput | Prisma.TodoCreateOrConnectWithoutCategoryInput[]
+  upsert?: Prisma.TodoUpsertWithWhereUniqueWithoutCategoryInput | Prisma.TodoUpsertWithWhereUniqueWithoutCategoryInput[]
+  createMany?: Prisma.TodoCreateManyCategoryInputEnvelope
+  set?: Prisma.TodoWhereUniqueInput | Prisma.TodoWhereUniqueInput[]
+  disconnect?: Prisma.TodoWhereUniqueInput | Prisma.TodoWhereUniqueInput[]
+  delete?: Prisma.TodoWhereUniqueInput | Prisma.TodoWhereUniqueInput[]
+  connect?: Prisma.TodoWhereUniqueInput | Prisma.TodoWhereUniqueInput[]
+  update?: Prisma.TodoUpdateWithWhereUniqueWithoutCategoryInput | Prisma.TodoUpdateWithWhereUniqueWithoutCategoryInput[]
+  updateMany?: Prisma.TodoUpdateManyWithWhereWithoutCategoryInput | Prisma.TodoUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.TodoScalarWhereInput | Prisma.TodoScalarWhereInput[]
+}
+
+export type TodoCreateNestedOneWithoutTaskEventInput = {
+  create?: Prisma.XOR<Prisma.TodoCreateWithoutTaskEventInput, Prisma.TodoUncheckedCreateWithoutTaskEventInput>
+  connectOrCreate?: Prisma.TodoCreateOrConnectWithoutTaskEventInput
+  connect?: Prisma.TodoWhereUniqueInput
+}
+
+export type TodoUpdateOneRequiredWithoutTaskEventNestedInput = {
+  create?: Prisma.XOR<Prisma.TodoCreateWithoutTaskEventInput, Prisma.TodoUncheckedCreateWithoutTaskEventInput>
+  connectOrCreate?: Prisma.TodoCreateOrConnectWithoutTaskEventInput
+  upsert?: Prisma.TodoUpsertWithoutTaskEventInput
+  connect?: Prisma.TodoWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TodoUpdateToOneWithWhereWithoutTaskEventInput, Prisma.TodoUpdateWithoutTaskEventInput>, Prisma.TodoUncheckedUpdateWithoutTaskEventInput>
 }
 
 export type TodoCreateNestedOneWithoutFilesInput = {
@@ -365,13 +666,184 @@ export type TodoUpdateOneRequiredWithoutFilesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TodoUpdateToOneWithWhereWithoutFilesInput, Prisma.TodoUpdateWithoutFilesInput>, Prisma.TodoUncheckedUpdateWithoutFilesInput>
 }
 
+export type TodoCreateWithoutCategoryInput = {
+  id?: string
+  userId: string
+  text: string
+  completed?: boolean
+  priority: number
+  scheduledFor: Date | string
+  status: $Enums.TodoStatus
+  rescheduledCount?: number
+  completionEstimatedMinutes: number
+  deleted?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  files?: Prisma.TodoFileCreateNestedManyWithoutTodoInput
+  taskEvent?: Prisma.TaskEventCreateNestedManyWithoutTodoInput
+}
+
+export type TodoUncheckedCreateWithoutCategoryInput = {
+  id?: string
+  userId: string
+  text: string
+  completed?: boolean
+  priority: number
+  scheduledFor: Date | string
+  status: $Enums.TodoStatus
+  rescheduledCount?: number
+  completionEstimatedMinutes: number
+  deleted?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  files?: Prisma.TodoFileUncheckedCreateNestedManyWithoutTodoInput
+  taskEvent?: Prisma.TaskEventUncheckedCreateNestedManyWithoutTodoInput
+}
+
+export type TodoCreateOrConnectWithoutCategoryInput = {
+  where: Prisma.TodoWhereUniqueInput
+  create: Prisma.XOR<Prisma.TodoCreateWithoutCategoryInput, Prisma.TodoUncheckedCreateWithoutCategoryInput>
+}
+
+export type TodoCreateManyCategoryInputEnvelope = {
+  data: Prisma.TodoCreateManyCategoryInput | Prisma.TodoCreateManyCategoryInput[]
+  skipDuplicates?: boolean
+}
+
+export type TodoUpsertWithWhereUniqueWithoutCategoryInput = {
+  where: Prisma.TodoWhereUniqueInput
+  update: Prisma.XOR<Prisma.TodoUpdateWithoutCategoryInput, Prisma.TodoUncheckedUpdateWithoutCategoryInput>
+  create: Prisma.XOR<Prisma.TodoCreateWithoutCategoryInput, Prisma.TodoUncheckedCreateWithoutCategoryInput>
+}
+
+export type TodoUpdateWithWhereUniqueWithoutCategoryInput = {
+  where: Prisma.TodoWhereUniqueInput
+  data: Prisma.XOR<Prisma.TodoUpdateWithoutCategoryInput, Prisma.TodoUncheckedUpdateWithoutCategoryInput>
+}
+
+export type TodoUpdateManyWithWhereWithoutCategoryInput = {
+  where: Prisma.TodoScalarWhereInput
+  data: Prisma.XOR<Prisma.TodoUpdateManyMutationInput, Prisma.TodoUncheckedUpdateManyWithoutCategoryInput>
+}
+
+export type TodoScalarWhereInput = {
+  AND?: Prisma.TodoScalarWhereInput | Prisma.TodoScalarWhereInput[]
+  OR?: Prisma.TodoScalarWhereInput[]
+  NOT?: Prisma.TodoScalarWhereInput | Prisma.TodoScalarWhereInput[]
+  id?: Prisma.StringFilter<"Todo"> | string
+  userId?: Prisma.StringFilter<"Todo"> | string
+  text?: Prisma.StringFilter<"Todo"> | string
+  completed?: Prisma.BoolFilter<"Todo"> | boolean
+  priority?: Prisma.IntFilter<"Todo"> | number
+  scheduledFor?: Prisma.DateTimeFilter<"Todo"> | Date | string
+  status?: Prisma.EnumTodoStatusFilter<"Todo"> | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFilter<"Todo"> | number
+  completionEstimatedMinutes?: Prisma.IntFilter<"Todo"> | number
+  deleted?: Prisma.BoolNullableFilter<"Todo"> | boolean | null
+  createdAt?: Prisma.DateTimeFilter<"Todo"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Todo"> | Date | string
+  tasksCategoryId?: Prisma.StringFilter<"Todo"> | string
+}
+
+export type TodoCreateWithoutTaskEventInput = {
+  id?: string
+  userId: string
+  text: string
+  completed?: boolean
+  priority: number
+  scheduledFor: Date | string
+  status: $Enums.TodoStatus
+  rescheduledCount?: number
+  completionEstimatedMinutes: number
+  deleted?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  files?: Prisma.TodoFileCreateNestedManyWithoutTodoInput
+  category: Prisma.TasksCategoryCreateNestedOneWithoutTodoInput
+}
+
+export type TodoUncheckedCreateWithoutTaskEventInput = {
+  id?: string
+  userId: string
+  text: string
+  completed?: boolean
+  priority: number
+  scheduledFor: Date | string
+  status: $Enums.TodoStatus
+  rescheduledCount?: number
+  completionEstimatedMinutes: number
+  deleted?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasksCategoryId: string
+  files?: Prisma.TodoFileUncheckedCreateNestedManyWithoutTodoInput
+}
+
+export type TodoCreateOrConnectWithoutTaskEventInput = {
+  where: Prisma.TodoWhereUniqueInput
+  create: Prisma.XOR<Prisma.TodoCreateWithoutTaskEventInput, Prisma.TodoUncheckedCreateWithoutTaskEventInput>
+}
+
+export type TodoUpsertWithoutTaskEventInput = {
+  update: Prisma.XOR<Prisma.TodoUpdateWithoutTaskEventInput, Prisma.TodoUncheckedUpdateWithoutTaskEventInput>
+  create: Prisma.XOR<Prisma.TodoCreateWithoutTaskEventInput, Prisma.TodoUncheckedCreateWithoutTaskEventInput>
+  where?: Prisma.TodoWhereInput
+}
+
+export type TodoUpdateToOneWithWhereWithoutTaskEventInput = {
+  where?: Prisma.TodoWhereInput
+  data: Prisma.XOR<Prisma.TodoUpdateWithoutTaskEventInput, Prisma.TodoUncheckedUpdateWithoutTaskEventInput>
+}
+
+export type TodoUpdateWithoutTaskEventInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  text?: Prisma.StringFieldUpdateOperationsInput | string
+  completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduledFor?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFieldUpdateOperationsInput | number
+  completionEstimatedMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  files?: Prisma.TodoFileUpdateManyWithoutTodoNestedInput
+  category?: Prisma.TasksCategoryUpdateOneRequiredWithoutTodoNestedInput
+}
+
+export type TodoUncheckedUpdateWithoutTaskEventInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  text?: Prisma.StringFieldUpdateOperationsInput | string
+  completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduledFor?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFieldUpdateOperationsInput | number
+  completionEstimatedMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasksCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  files?: Prisma.TodoFileUncheckedUpdateManyWithoutTodoNestedInput
+}
+
 export type TodoCreateWithoutFilesInput = {
   id?: string
   userId: string
   text: string
   completed?: boolean
+  priority: number
+  scheduledFor: Date | string
+  status: $Enums.TodoStatus
+  rescheduledCount?: number
+  completionEstimatedMinutes: number
+  deleted?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  category: Prisma.TasksCategoryCreateNestedOneWithoutTodoInput
+  taskEvent?: Prisma.TaskEventCreateNestedManyWithoutTodoInput
 }
 
 export type TodoUncheckedCreateWithoutFilesInput = {
@@ -379,8 +851,16 @@ export type TodoUncheckedCreateWithoutFilesInput = {
   userId: string
   text: string
   completed?: boolean
+  priority: number
+  scheduledFor: Date | string
+  status: $Enums.TodoStatus
+  rescheduledCount?: number
+  completionEstimatedMinutes: number
+  deleted?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tasksCategoryId: string
+  taskEvent?: Prisma.TaskEventUncheckedCreateNestedManyWithoutTodoInput
 }
 
 export type TodoCreateOrConnectWithoutFilesInput = {
@@ -404,8 +884,16 @@ export type TodoUpdateWithoutFilesInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduledFor?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFieldUpdateOperationsInput | number
+  completionEstimatedMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.TasksCategoryUpdateOneRequiredWithoutTodoNestedInput
+  taskEvent?: Prisma.TaskEventUpdateManyWithoutTodoNestedInput
 }
 
 export type TodoUncheckedUpdateWithoutFilesInput = {
@@ -413,6 +901,78 @@ export type TodoUncheckedUpdateWithoutFilesInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduledFor?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFieldUpdateOperationsInput | number
+  completionEstimatedMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasksCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  taskEvent?: Prisma.TaskEventUncheckedUpdateManyWithoutTodoNestedInput
+}
+
+export type TodoCreateManyCategoryInput = {
+  id?: string
+  userId: string
+  text: string
+  completed?: boolean
+  priority: number
+  scheduledFor: Date | string
+  status: $Enums.TodoStatus
+  rescheduledCount?: number
+  completionEstimatedMinutes: number
+  deleted?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type TodoUpdateWithoutCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  text?: Prisma.StringFieldUpdateOperationsInput | string
+  completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduledFor?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFieldUpdateOperationsInput | number
+  completionEstimatedMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  files?: Prisma.TodoFileUpdateManyWithoutTodoNestedInput
+  taskEvent?: Prisma.TaskEventUpdateManyWithoutTodoNestedInput
+}
+
+export type TodoUncheckedUpdateWithoutCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  text?: Prisma.StringFieldUpdateOperationsInput | string
+  completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduledFor?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFieldUpdateOperationsInput | number
+  completionEstimatedMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  files?: Prisma.TodoFileUncheckedUpdateManyWithoutTodoNestedInput
+  taskEvent?: Prisma.TaskEventUncheckedUpdateManyWithoutTodoNestedInput
+}
+
+export type TodoUncheckedUpdateManyWithoutCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  text?: Prisma.StringFieldUpdateOperationsInput | string
+  completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  priority?: Prisma.IntFieldUpdateOperationsInput | number
+  scheduledFor?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  rescheduledCount?: Prisma.IntFieldUpdateOperationsInput | number
+  completionEstimatedMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -424,10 +984,12 @@ export type TodoUncheckedUpdateWithoutFilesInput = {
 
 export type TodoCountOutputType = {
   files: number
+  taskEvent: number
 }
 
 export type TodoCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   files?: boolean | TodoCountOutputTypeCountFilesArgs
+  taskEvent?: boolean | TodoCountOutputTypeCountTaskEventArgs
 }
 
 /**
@@ -447,15 +1009,31 @@ export type TodoCountOutputTypeCountFilesArgs<ExtArgs extends runtime.Types.Exte
   where?: Prisma.TodoFileWhereInput
 }
 
+/**
+ * TodoCountOutputType without action
+ */
+export type TodoCountOutputTypeCountTaskEventArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TaskEventWhereInput
+}
+
 
 export type TodoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
   text?: boolean
   completed?: boolean
+  priority?: boolean
+  scheduledFor?: boolean
+  status?: boolean
+  rescheduledCount?: boolean
+  completionEstimatedMinutes?: boolean
+  deleted?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  tasksCategoryId?: boolean
   files?: boolean | Prisma.Todo$filesArgs<ExtArgs>
+  category?: boolean | Prisma.TasksCategoryDefaultArgs<ExtArgs>
+  taskEvent?: boolean | Prisma.Todo$taskEventArgs<ExtArgs>
   _count?: boolean | Prisma.TodoCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["todo"]>
 
@@ -464,8 +1042,16 @@ export type TodoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   userId?: boolean
   text?: boolean
   completed?: boolean
+  priority?: boolean
+  scheduledFor?: boolean
+  status?: boolean
+  rescheduledCount?: boolean
+  completionEstimatedMinutes?: boolean
+  deleted?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  tasksCategoryId?: boolean
+  category?: boolean | Prisma.TasksCategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["todo"]>
 
 export type TodoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -473,8 +1059,16 @@ export type TodoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   userId?: boolean
   text?: boolean
   completed?: boolean
+  priority?: boolean
+  scheduledFor?: boolean
+  status?: boolean
+  rescheduledCount?: boolean
+  completionEstimatedMinutes?: boolean
+  deleted?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  tasksCategoryId?: boolean
+  category?: boolean | Prisma.TasksCategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["todo"]>
 
 export type TodoSelectScalar = {
@@ -482,30 +1076,52 @@ export type TodoSelectScalar = {
   userId?: boolean
   text?: boolean
   completed?: boolean
+  priority?: boolean
+  scheduledFor?: boolean
+  status?: boolean
+  rescheduledCount?: boolean
+  completionEstimatedMinutes?: boolean
+  deleted?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  tasksCategoryId?: boolean
 }
 
-export type TodoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "text" | "completed" | "createdAt" | "updatedAt", ExtArgs["result"]["todo"]>
+export type TodoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "text" | "completed" | "priority" | "scheduledFor" | "status" | "rescheduledCount" | "completionEstimatedMinutes" | "deleted" | "createdAt" | "updatedAt" | "tasksCategoryId", ExtArgs["result"]["todo"]>
 export type TodoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   files?: boolean | Prisma.Todo$filesArgs<ExtArgs>
+  category?: boolean | Prisma.TasksCategoryDefaultArgs<ExtArgs>
+  taskEvent?: boolean | Prisma.Todo$taskEventArgs<ExtArgs>
   _count?: boolean | Prisma.TodoCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type TodoIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type TodoIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type TodoIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  category?: boolean | Prisma.TasksCategoryDefaultArgs<ExtArgs>
+}
+export type TodoIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  category?: boolean | Prisma.TasksCategoryDefaultArgs<ExtArgs>
+}
 
 export type $TodoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Todo"
   objects: {
     files: Prisma.$TodoFilePayload<ExtArgs>[]
+    category: Prisma.$TasksCategoryPayload<ExtArgs>
+    taskEvent: Prisma.$TaskEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
     text: string
     completed: boolean
+    priority: number
+    scheduledFor: Date
+    status: $Enums.TodoStatus
+    rescheduledCount: number
+    completionEstimatedMinutes: number
+    deleted: boolean | null
     createdAt: Date
     updatedAt: Date
+    tasksCategoryId: string
   }, ExtArgs["result"]["todo"]>
   composites: {}
 }
@@ -901,6 +1517,8 @@ readonly fields: TodoFieldRefs;
 export interface Prisma__TodoClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   files<T extends Prisma.Todo$filesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Todo$filesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TodoFilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  category<T extends Prisma.TasksCategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TasksCategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__TasksCategoryClient<runtime.Types.Result.GetResult<Prisma.$TasksCategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  taskEvent<T extends Prisma.Todo$taskEventArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Todo$taskEventArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -934,8 +1552,15 @@ export interface TodoFieldRefs {
   readonly userId: Prisma.FieldRef<"Todo", 'String'>
   readonly text: Prisma.FieldRef<"Todo", 'String'>
   readonly completed: Prisma.FieldRef<"Todo", 'Boolean'>
+  readonly priority: Prisma.FieldRef<"Todo", 'Int'>
+  readonly scheduledFor: Prisma.FieldRef<"Todo", 'DateTime'>
+  readonly status: Prisma.FieldRef<"Todo", 'TodoStatus'>
+  readonly rescheduledCount: Prisma.FieldRef<"Todo", 'Int'>
+  readonly completionEstimatedMinutes: Prisma.FieldRef<"Todo", 'Int'>
+  readonly deleted: Prisma.FieldRef<"Todo", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Todo", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Todo", 'DateTime'>
+  readonly tasksCategoryId: Prisma.FieldRef<"Todo", 'String'>
 }
     
 
@@ -1185,6 +1810,10 @@ export type TodoCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.TodoCreateManyInput | Prisma.TodoCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TodoIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1255,6 +1884,10 @@ export type TodoUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Todos to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TodoIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1345,6 +1978,30 @@ export type Todo$filesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   take?: number
   skip?: number
   distinct?: Prisma.TodoFileScalarFieldEnum | Prisma.TodoFileScalarFieldEnum[]
+}
+
+/**
+ * Todo.taskEvent
+ */
+export type Todo$taskEventArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TaskEvent
+   */
+  select?: Prisma.TaskEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TaskEvent
+   */
+  omit?: Prisma.TaskEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TaskEventInclude<ExtArgs> | null
+  where?: Prisma.TaskEventWhereInput
+  orderBy?: Prisma.TaskEventOrderByWithRelationInput | Prisma.TaskEventOrderByWithRelationInput[]
+  cursor?: Prisma.TaskEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TaskEventScalarFieldEnum | Prisma.TaskEventScalarFieldEnum[]
 }
 
 /**

@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server"
-import { NextResponse } from "next/server"
-import EmbeddingService from "@/services/EmbeddingService"
+import { auth } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import EmbeddingService from "@/services/EmbeddingService";
+import { recordTaskEvent } from "@/utils/taskEvents";
+import { TaskEventType } from "../../../prisma/generated/prisma/enums";
 const embeddingService = new EmbeddingService();
 export async function GET() {
     try {
@@ -23,7 +25,8 @@ export async function GET() {
                 createdAt: {
                     gte: startOfDay,
                     lte: endOfDay
-                }
+                },
+                deleted: false
             },
             include: { files: true },
             orderBy: { createdAt: 'asc' }
@@ -38,18 +41,63 @@ export async function POST(request: Request) {
     try {
         const { userId } = await auth();
         if (!userId) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
-        const { text } = await request.json();
+
+        const {
+            text,
+            priority,
+            scheduledFor,
+            status,
+            completionEstimatedMinutes,
+            category,
+        } = await request.json();
+
+        // Ensure a TasksCategory exists for this user and category name
+        let categoryRecord = await prisma.tasksCategory.findFirst({
+            where: {
+                userId,
+                name: category,
+            },
+        });
+
+        if (!categoryRecord) {
+            categoryRecord = await prisma.tasksCategory.create({
+                data: {
+                    userId,
+                    name: category,
+                },
+            });
+        }
+
         const todo = await prisma.todo.create({
             data: {
-                userId, text,
-            }
-        })
-        embeddingService.storeEmbedding(userId, "todo_created", text, todo.id,
-            { createdAt: todo.createdAt, completed: false }).catch(err => console.error("Failed to store embeddings", err))
-        return NextResponse.json(todo)
+                userId,
+                text,
+                priority,
+                scheduledFor,
+                status,
+                completionEstimatedMinutes,
+                tasksCategoryId: categoryRecord.id,
+            },
+        });
+
+        await recordTaskEvent({
+            userId,
+            todoId: todo.id,
+            eventType: TaskEventType.TASK_CREATED,
+            eventValue: {
+                text: todo.text,
+                priority: todo.priority,
+                scheduledFor: todo.scheduledFor,
+                status: todo.status,
+                completionEstimatedMinutes: todo.completionEstimatedMinutes,
+            },
+        });
+
+        return NextResponse.json(todo);
     } catch (error) {
+        console.error("Error creating todo:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
     }
 }

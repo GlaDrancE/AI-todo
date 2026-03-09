@@ -52,6 +52,11 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Todo: 'Todo',
+  TasksCategory: 'TasksCategory',
+  TaskEvent: 'TaskEvent',
+  DailyUserMetrics: 'DailyUserMetrics',
+  CategoryMetrics: 'CategoryMetrics',
+  HourlyProductivityMetrics: 'HourlyProductivityMetrics',
   TodoFile: 'TodoFile',
   UserProfile: 'UserProfile',
   ContextFile: 'ContextFile',
@@ -80,11 +85,86 @@ export const TodoScalarFieldEnum = {
   userId: 'userId',
   text: 'text',
   completed: 'completed',
+  priority: 'priority',
+  scheduledFor: 'scheduledFor',
+  status: 'status',
+  rescheduledCount: 'rescheduledCount',
+  completionEstimatedMinutes: 'completionEstimatedMinutes',
+  deleted: 'deleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  tasksCategoryId: 'tasksCategoryId'
+} as const
+
+export type TodoScalarFieldEnum = (typeof TodoScalarFieldEnum)[keyof typeof TodoScalarFieldEnum]
+
+
+export const TasksCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type TodoScalarFieldEnum = (typeof TodoScalarFieldEnum)[keyof typeof TodoScalarFieldEnum]
+export type TasksCategoryScalarFieldEnum = (typeof TasksCategoryScalarFieldEnum)[keyof typeof TasksCategoryScalarFieldEnum]
+
+
+export const TaskEventScalarFieldEnum = {
+  id: 'id',
+  todoId: 'todoId',
+  userId: 'userId',
+  eventType: 'eventType',
+  eventValue: 'eventValue',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TaskEventScalarFieldEnum = (typeof TaskEventScalarFieldEnum)[keyof typeof TaskEventScalarFieldEnum]
+
+
+export const DailyUserMetricsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  totalTasksCompleted: 'totalTasksCompleted',
+  totalTasksScheduled: 'totalTasksScheduled',
+  completionRate: 'completionRate',
+  avgDelayHours: 'avgDelayHours',
+  totalRescheduledTasks: 'totalRescheduledTasks',
+  deepWorkCompletionRate: 'deepWorkCompletionRate'
+} as const
+
+export type DailyUserMetricsScalarFieldEnum = (typeof DailyUserMetricsScalarFieldEnum)[keyof typeof DailyUserMetricsScalarFieldEnum]
+
+
+export const CategoryMetricsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  categoryId: 'categoryId',
+  completionRate: 'completionRate',
+  avgDelayHours: 'avgDelayHours',
+  totalRescheduledTasks: 'totalRescheduledTasks',
+  frictionScore: 'frictionScore',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CategoryMetricsScalarFieldEnum = (typeof CategoryMetricsScalarFieldEnum)[keyof typeof CategoryMetricsScalarFieldEnum]
+
+
+export const HourlyProductivityMetricsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  hour: 'hour',
+  completionRate: 'completionRate',
+  avgDelay: 'avgDelay',
+  tasksAttempted: 'tasksAttempted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type HourlyProductivityMetricsScalarFieldEnum = (typeof HourlyProductivityMetricsScalarFieldEnum)[keyof typeof HourlyProductivityMetricsScalarFieldEnum]
 
 
 export const TodoFileScalarFieldEnum = {
@@ -159,6 +239,13 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const NullableJsonNullValueInput = {

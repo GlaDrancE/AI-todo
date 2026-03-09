@@ -23,6 +23,31 @@ export * from './enums';
  */
 export type Todo = Prisma.TodoModel
 /**
+ * Model TasksCategory
+ * 
+ */
+export type TasksCategory = Prisma.TasksCategoryModel
+/**
+ * Model TaskEvent
+ * 
+ */
+export type TaskEvent = Prisma.TaskEventModel
+/**
+ * Model DailyUserMetrics
+ * 
+ */
+export type DailyUserMetrics = Prisma.DailyUserMetricsModel
+/**
+ * Model CategoryMetrics
+ * 
+ */
+export type CategoryMetrics = Prisma.CategoryMetricsModel
+/**
+ * Model HourlyProductivityMetrics
+ * 
+ */
+export type HourlyProductivityMetrics = Prisma.HourlyProductivityMetricsModel
+/**
  * Model TodoFile
  * 
  */

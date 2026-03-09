@@ -13,17 +13,128 @@ datasource db {
   provider = "postgresql"
 }
 
+enum TodoStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskEventType {
+  TASK_CREATED
+  TASK_SCHEDULED
+  TASK_RESCHEDULED
+  TASK_STARTED
+  TASK_COMPLETED
+  TASK_CANCELLED
+  TASK_DELETED
+}
+
 model Todo {
-  id        String     @id @default(cuid())
+  id        String  @id @default(cuid())
   userId    String // Clerk user ID
   text      String
-  completed Boolean    @default(false)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  files     TodoFile[]
+  completed Boolean @default(false)
+
+  priority                   Int
+  scheduledFor               DateTime
+  status                     TodoStatus
+  rescheduledCount           Int        @default(0)
+  completionEstimatedMinutes Int
+  files                      TodoFile[]
+  deleted                    Boolean?   @default(false)
+  missed                     Int        @default(0)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  tasksCategoryId String
+  category        TasksCategory @relation(fields: [tasksCategoryId], references: [id])
+  taskEvent       TaskEvent[]
 
   @@index([userId])
   @@map("todos")
+}
+
+model TasksCategory {
+  id              String            @id @default(cuid())
+  name            String
+  userId          String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  Todo            Todo[]
+  CategoryMetrics CategoryMetrics[]
+
+  @@index([id])
+  @@map("tasks_categories")
+}
+
+model TaskEvent {
+  id         String        @id @default(cuid())
+  todoId     String
+  userId     String
+  eventType  TaskEventType
+  eventValue Json
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  todo Todo @relation(fields: [todoId], references: [id], onDelete: SetNull)
+
+  @@index([id])
+  @@index([todoId])
+  @@map("task_events")
+}
+
+model DailyUserMetrics {
+  id                     String   @id @default(cuid())
+  userId                 String
+  date                   DateTime
+  totalTasksCompleted    Int      @default(0)
+  totalTasksScheduled    Int      @default(0)
+  completionRate         Float    @default(0)
+  avgDelayHours          Float    @default(0)
+  totalRescheduledTasks  Int      @default(0)
+  deepWorkCompletionRate Float    @default(0)
+
+  @@index([id])
+  @@index([userId])
+  @@map("daily_user_metrics")
+}
+
+model CategoryMetrics {
+  id                    String @id @default(cuid())
+  userId                String
+  categoryId            String
+  completionRate        Float  @default(0)
+  avgDelayHours         Float  @default(0)
+  totalRescheduledTasks Int    @default(0)
+  frictionScore         Float  @default(0)
+  totalMissedCount      Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category TasksCategory @relation(fields: [categoryId], references: [id])
+
+  @@index([id])
+  @@index([userId])
+  @@index([categoryId])
+  @@map("category_metrics")
+}
+
+model HourlyProductivityMetrics {
+  id             String @id @default(cuid())
+  userId         String
+  hour           Int
+  completionRate Float  @default(0)
+  avgDelay       Float  @default(0)
+  tasksAttempted Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([id])
+  @@index([userId])
+  @@index([hour])
+  @@map("hourly_productivity_metrics")
 }
 
 model TodoFile {

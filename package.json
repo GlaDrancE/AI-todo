@@ -16,6 +16,8 @@
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@vercel/blob": "^2.0.1",
+    "bullmq": "^5.70.1",
+    "ioredis": "^5.10.0",
     "lucide-react": "^0.563.0",
     "mammoth": "^1.11.0",
     "next": "16.1.6",

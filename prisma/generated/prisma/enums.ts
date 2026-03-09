@@ -9,7 +9,23 @@
 * 🟢 You can import this file directly.
 */
 
+export const TodoStatus = {
+  SCHEDULED: 'SCHEDULED',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type TodoStatus = (typeof TodoStatus)[keyof typeof TodoStatus]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const TaskEventType = {
+  TASK_CREATED: 'TASK_CREATED',
+  TASK_SCHEDULED: 'TASK_SCHEDULED',
+  TASK_RESCHEDULED: 'TASK_RESCHEDULED',
+  TASK_STARTED: 'TASK_STARTED',
+  TASK_COMPLETED: 'TASK_COMPLETED',
+  TASK_CANCELLED: 'TASK_CANCELLED',
+  TASK_DELETED: 'TASK_DELETED'
+} as const
+
+export type TaskEventType = (typeof TaskEventType)[keyof typeof TaskEventType]

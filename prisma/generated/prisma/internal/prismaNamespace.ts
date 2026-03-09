@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.4.0
- * Query Engine version: ab56fe763f921d033a6c195e7ddeb3e255bdbb57
+ * Prisma Client JS version: 7.3.0
+ * Query Engine version: 9d6ad21cbbceab97458517b147a6a09ff43aa735
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.4.0",
-  engine: "ab56fe763f921d033a6c195e7ddeb3e255bdbb57"
+  client: "7.3.0",
+  engine: "9d6ad21cbbceab97458517b147a6a09ff43aa735"
 }
 
 /**
@@ -385,6 +385,11 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Todo: 'Todo',
+  TasksCategory: 'TasksCategory',
+  TaskEvent: 'TaskEvent',
+  DailyUserMetrics: 'DailyUserMetrics',
+  CategoryMetrics: 'CategoryMetrics',
+  HourlyProductivityMetrics: 'HourlyProductivityMetrics',
   TodoFile: 'TodoFile',
   UserProfile: 'UserProfile',
   ContextFile: 'ContextFile',
@@ -405,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "todo" | "todoFile" | "userProfile" | "contextFile" | "aIContext" | "contextEmbedding"
+    modelProps: "todo" | "tasksCategory" | "taskEvent" | "dailyUserMetrics" | "categoryMetrics" | "hourlyProductivityMetrics" | "todoFile" | "userProfile" | "contextFile" | "aIContext" | "contextEmbedding"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -480,6 +485,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.TodoCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.TodoCountAggregateOutputType> | number
+        }
+      }
+    }
+    TasksCategory: {
+      payload: Prisma.$TasksCategoryPayload<ExtArgs>
+      fields: Prisma.TasksCategoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TasksCategoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TasksCategoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TasksCategoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TasksCategoryPayload>
+        }
+        findFirst: {
+          args: Prisma.TasksCategoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TasksCategoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TasksCategoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TasksCategoryPayload>
+        }
+        findMany: {
+          args: Prisma.TasksCategoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TasksCategoryPayload>[]
+        }
+        create: {
+          args: Prisma.TasksCategoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TasksCategoryPayload>
+        }
+        createMany: {
+          args: Prisma.TasksCategoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TasksCategoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TasksCategoryPayload>[]
+        }
+        delete: {
+          args: Prisma.TasksCategoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TasksCategoryPayload>
+        }
+        update: {
+          args: Prisma.TasksCategoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TasksCategoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.TasksCategoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TasksCategoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TasksCategoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TasksCategoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.TasksCategoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TasksCategoryPayload>
+        }
+        aggregate: {
+          args: Prisma.TasksCategoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTasksCategory>
+        }
+        groupBy: {
+          args: Prisma.TasksCategoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TasksCategoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TasksCategoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TasksCategoryCountAggregateOutputType> | number
+        }
+      }
+    }
+    TaskEvent: {
+      payload: Prisma.$TaskEventPayload<ExtArgs>
+      fields: Prisma.TaskEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TaskEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TaskEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskEventPayload>
+        }
+        findFirst: {
+          args: Prisma.TaskEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TaskEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskEventPayload>
+        }
+        findMany: {
+          args: Prisma.TaskEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskEventPayload>[]
+        }
+        create: {
+          args: Prisma.TaskEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskEventPayload>
+        }
+        createMany: {
+          args: Prisma.TaskEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TaskEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskEventPayload>[]
+        }
+        delete: {
+          args: Prisma.TaskEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskEventPayload>
+        }
+        update: {
+          args: Prisma.TaskEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.TaskEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TaskEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TaskEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.TaskEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TaskEventPayload>
+        }
+        aggregate: {
+          args: Prisma.TaskEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTaskEvent>
+        }
+        groupBy: {
+          args: Prisma.TaskEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TaskEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TaskEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TaskEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    DailyUserMetrics: {
+      payload: Prisma.$DailyUserMetricsPayload<ExtArgs>
+      fields: Prisma.DailyUserMetricsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DailyUserMetricsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUserMetricsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DailyUserMetricsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUserMetricsPayload>
+        }
+        findFirst: {
+          args: Prisma.DailyUserMetricsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUserMetricsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DailyUserMetricsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUserMetricsPayload>
+        }
+        findMany: {
+          args: Prisma.DailyUserMetricsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUserMetricsPayload>[]
+        }
+        create: {
+          args: Prisma.DailyUserMetricsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUserMetricsPayload>
+        }
+        createMany: {
+          args: Prisma.DailyUserMetricsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DailyUserMetricsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUserMetricsPayload>[]
+        }
+        delete: {
+          args: Prisma.DailyUserMetricsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUserMetricsPayload>
+        }
+        update: {
+          args: Prisma.DailyUserMetricsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUserMetricsPayload>
+        }
+        deleteMany: {
+          args: Prisma.DailyUserMetricsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DailyUserMetricsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DailyUserMetricsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUserMetricsPayload>[]
+        }
+        upsert: {
+          args: Prisma.DailyUserMetricsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUserMetricsPayload>
+        }
+        aggregate: {
+          args: Prisma.DailyUserMetricsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDailyUserMetrics>
+        }
+        groupBy: {
+          args: Prisma.DailyUserMetricsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailyUserMetricsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DailyUserMetricsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailyUserMetricsCountAggregateOutputType> | number
+        }
+      }
+    }
+    CategoryMetrics: {
+      payload: Prisma.$CategoryMetricsPayload<ExtArgs>
+      fields: Prisma.CategoryMetricsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CategoryMetricsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMetricsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CategoryMetricsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMetricsPayload>
+        }
+        findFirst: {
+          args: Prisma.CategoryMetricsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMetricsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CategoryMetricsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMetricsPayload>
+        }
+        findMany: {
+          args: Prisma.CategoryMetricsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMetricsPayload>[]
+        }
+        create: {
+          args: Prisma.CategoryMetricsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMetricsPayload>
+        }
+        createMany: {
+          args: Prisma.CategoryMetricsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CategoryMetricsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMetricsPayload>[]
+        }
+        delete: {
+          args: Prisma.CategoryMetricsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMetricsPayload>
+        }
+        update: {
+          args: Prisma.CategoryMetricsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMetricsPayload>
+        }
+        deleteMany: {
+          args: Prisma.CategoryMetricsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CategoryMetricsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CategoryMetricsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMetricsPayload>[]
+        }
+        upsert: {
+          args: Prisma.CategoryMetricsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryMetricsPayload>
+        }
+        aggregate: {
+          args: Prisma.CategoryMetricsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCategoryMetrics>
+        }
+        groupBy: {
+          args: Prisma.CategoryMetricsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoryMetricsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CategoryMetricsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoryMetricsCountAggregateOutputType> | number
+        }
+      }
+    }
+    HourlyProductivityMetrics: {
+      payload: Prisma.$HourlyProductivityMetricsPayload<ExtArgs>
+      fields: Prisma.HourlyProductivityMetricsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.HourlyProductivityMetricsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HourlyProductivityMetricsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.HourlyProductivityMetricsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HourlyProductivityMetricsPayload>
+        }
+        findFirst: {
+          args: Prisma.HourlyProductivityMetricsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HourlyProductivityMetricsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.HourlyProductivityMetricsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HourlyProductivityMetricsPayload>
+        }
+        findMany: {
+          args: Prisma.HourlyProductivityMetricsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HourlyProductivityMetricsPayload>[]
+        }
+        create: {
+          args: Prisma.HourlyProductivityMetricsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HourlyProductivityMetricsPayload>
+        }
+        createMany: {
+          args: Prisma.HourlyProductivityMetricsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.HourlyProductivityMetricsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HourlyProductivityMetricsPayload>[]
+        }
+        delete: {
+          args: Prisma.HourlyProductivityMetricsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HourlyProductivityMetricsPayload>
+        }
+        update: {
+          args: Prisma.HourlyProductivityMetricsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HourlyProductivityMetricsPayload>
+        }
+        deleteMany: {
+          args: Prisma.HourlyProductivityMetricsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.HourlyProductivityMetricsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.HourlyProductivityMetricsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HourlyProductivityMetricsPayload>[]
+        }
+        upsert: {
+          args: Prisma.HourlyProductivityMetricsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HourlyProductivityMetricsPayload>
+        }
+        aggregate: {
+          args: Prisma.HourlyProductivityMetricsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateHourlyProductivityMetrics>
+        }
+        groupBy: {
+          args: Prisma.HourlyProductivityMetricsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HourlyProductivityMetricsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.HourlyProductivityMetricsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HourlyProductivityMetricsCountAggregateOutputType> | number
         }
       }
     }
@@ -881,11 +1256,86 @@ export const TodoScalarFieldEnum = {
   userId: 'userId',
   text: 'text',
   completed: 'completed',
+  priority: 'priority',
+  scheduledFor: 'scheduledFor',
+  status: 'status',
+  rescheduledCount: 'rescheduledCount',
+  completionEstimatedMinutes: 'completionEstimatedMinutes',
+  deleted: 'deleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  tasksCategoryId: 'tasksCategoryId'
+} as const
+
+export type TodoScalarFieldEnum = (typeof TodoScalarFieldEnum)[keyof typeof TodoScalarFieldEnum]
+
+
+export const TasksCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type TodoScalarFieldEnum = (typeof TodoScalarFieldEnum)[keyof typeof TodoScalarFieldEnum]
+export type TasksCategoryScalarFieldEnum = (typeof TasksCategoryScalarFieldEnum)[keyof typeof TasksCategoryScalarFieldEnum]
+
+
+export const TaskEventScalarFieldEnum = {
+  id: 'id',
+  todoId: 'todoId',
+  userId: 'userId',
+  eventType: 'eventType',
+  eventValue: 'eventValue',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TaskEventScalarFieldEnum = (typeof TaskEventScalarFieldEnum)[keyof typeof TaskEventScalarFieldEnum]
+
+
+export const DailyUserMetricsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  totalTasksCompleted: 'totalTasksCompleted',
+  totalTasksScheduled: 'totalTasksScheduled',
+  completionRate: 'completionRate',
+  avgDelayHours: 'avgDelayHours',
+  totalRescheduledTasks: 'totalRescheduledTasks',
+  deepWorkCompletionRate: 'deepWorkCompletionRate'
+} as const
+
+export type DailyUserMetricsScalarFieldEnum = (typeof DailyUserMetricsScalarFieldEnum)[keyof typeof DailyUserMetricsScalarFieldEnum]
+
+
+export const CategoryMetricsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  categoryId: 'categoryId',
+  completionRate: 'completionRate',
+  avgDelayHours: 'avgDelayHours',
+  totalRescheduledTasks: 'totalRescheduledTasks',
+  frictionScore: 'frictionScore',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CategoryMetricsScalarFieldEnum = (typeof CategoryMetricsScalarFieldEnum)[keyof typeof CategoryMetricsScalarFieldEnum]
+
+
+export const HourlyProductivityMetricsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  hour: 'hour',
+  completionRate: 'completionRate',
+  avgDelay: 'avgDelay',
+  tasksAttempted: 'tasksAttempted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type HourlyProductivityMetricsScalarFieldEnum = (typeof HourlyProductivityMetricsScalarFieldEnum)[keyof typeof HourlyProductivityMetricsScalarFieldEnum]
 
 
 export const TodoFileScalarFieldEnum = {
@@ -962,6 +1412,13 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const NullableJsonNullValueInput = {
   DbNull: DbNull,
   JsonNull: JsonNull
@@ -1023,6 +1480,20 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -1037,16 +1508,30 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
- * Reference to a field of type 'Int'
+ * Reference to a field of type 'TodoStatus'
  */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+export type EnumTodoStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TodoStatus'>
     
 
 
 /**
- * Reference to a field of type 'Int[]'
+ * Reference to a field of type 'TodoStatus[]'
  */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+export type ListEnumTodoStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TodoStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TaskEventType'
+ */
+export type EnumTaskEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskEventType'>
+    
+
+
+/**
+ * Reference to a field of type 'TaskEventType[]'
+ */
+export type ListEnumTaskEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskEventType[]'>
     
 
 
@@ -1173,6 +1658,11 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   todo?: Prisma.TodoOmit
+  tasksCategory?: Prisma.TasksCategoryOmit
+  taskEvent?: Prisma.TaskEventOmit
+  dailyUserMetrics?: Prisma.DailyUserMetricsOmit
+  categoryMetrics?: Prisma.CategoryMetricsOmit
+  hourlyProductivityMetrics?: Prisma.HourlyProductivityMetricsOmit
   todoFile?: Prisma.TodoFileOmit
   userProfile?: Prisma.UserProfileOmit
   contextFile?: Prisma.ContextFileOmit

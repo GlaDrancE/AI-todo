@@ -2,6 +2,8 @@ import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { onTodoComplete } from '@/utils/todo'
+import { recordTaskEvent } from '@/utils/taskEvents'
+import { TaskEventType } from '@/prisma/generated/prisma/enums'
 
 // PATCH - Update a todo (toggle completed)
 export async function PATCH(
@@ -28,16 +30,17 @@ export async function PATCH(
         }
 
         if (completed) {
-            const context = await prisma.contextEmbedding.findFirst({
-                where: {
-                    contentId: id,
-                    text: text,
-                    contentType: "todo_complete",
-                }
+            await recordTaskEvent({
+                userId,
+                todoId: id,
+                eventType: TaskEventType.TASK_COMPLETED,
+                eventValue: {
+                    text: existingTodo.text,
+                    priority: existingTodo.priority,
+                    scheduledFor: existingTodo.scheduledFor,
+                    status: existingTodo.status,
+                },
             })
-            if (!context) {
-                await onTodoComplete(userId, "todo_complete", text, id, { completedAt: new Date() })
-            }
         }
 
         const todo = await prisma.todo.update({
@@ -76,8 +79,21 @@ export async function DELETE(
             return NextResponse.json({ error: 'Todo not found' }, { status: 404 })
         }
 
-        await prisma.todo.delete({
+        await prisma.todo.update({
             where: { id },
+            data: { deleted: true },
+        })
+
+        await recordTaskEvent({
+            userId,
+            todoId: id,
+            eventType: TaskEventType.TASK_DELETED,
+            eventValue: {
+                text: existingTodo.text,
+                priority: existingTodo.priority,
+                scheduledFor: existingTodo.scheduledFor,
+                status: existingTodo.status,
+            },
         })
 
         return NextResponse.json({ success: true })
